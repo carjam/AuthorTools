@@ -6,8 +6,22 @@ nltk.download('punkt')
 from curses.ascii import isdigit
 from nltk.corpus import cmudict
 import nltk.data
+from math import log
 import pprint
 import sys
+
+# Function to compute the base-2 logarithm of a floating point number.
+def log2(number):
+  return log(number) / log(2)
+
+
+def is_number(s):
+  try:
+      float(s)
+      return True
+  except ValueError:
+      return False
+
 
 def normalizeText(data):
   cleaner = re.compile('[^a-z]+')
@@ -83,6 +97,18 @@ def countLetterFrequencies(data):
   return letter_frequency
 
 
+def countWordFrequencies(data):
+  word_frequency = {}
+  #words = nltk.word_tokenize(data)
+  words = data.split()
+  for word in words:
+      if word in word_frequency:
+          word_frequency[word] += 1
+      else:
+          word_frequency[word] = 1
+  return word_frequency
+
+
 def countWords(data):
   word_count = 0
   #words = nltk.word_tokenize(data)
@@ -112,11 +138,13 @@ def colemanLiau(characters, words, sentences):
   #https://en.wikipedia.org/wiki/Coleman%E2%80%93Liau_index
   return 5.89*(characters/words) - 30*(sentences/words) - 15.8
 
+
 def flesch(words, sentences, syllables):
   # Flesch = 206.835 - 1.015*(total_words/total_sentences) - 84.6*(total_syllables/total_words)
   #https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests
   #0 to 100, with 0 equivalent to the 12th grade and 100 equivalent to the 4th grade
   return 206.835 - 1.015*(words/sentences) - 84.6*(syllables/words)
+
 
 def fog(words, sentences, complex_words):
   # Fog = 0.4*[(words/sentences) + 100*(complex_words/words)]
@@ -128,6 +156,52 @@ def smog(complex_words, sentences):
   # SMOG = sqrt[total_complex_words * (30/total_sentences)] + 3
   #https://en.wikipedia.org/wiki/SMOG
   return (complex_words * (30/sentences))**(1/2) + 3
+
+
+def calcCharEntropy(data):
+  letter_frequency = countLetterFrequencies(data)
+  length_sum = 0.0
+  for letter in letter_frequency:
+    probability = float(letter_frequency[letter]) / len(data)
+    length_sum += probability * log2(probability)
+  return length_sum
+
+
+def calcWordEntropy(data):
+  word_frequency = countWordFrequencies(data)
+  length_sum = 0.0
+  for word in word_frequency:
+    probability = float(word_frequency[word]) / len(word_frequency)
+    length_sum += probability * log2(probability)
+  return length_sum
+
+#since entropy is cumulative, final word will always be returned
+def meaningfulWords(data, significance):
+  total_entropy = calcWordEntropy(data)
+  word_frequency = countWordFrequencies(data)
+  
+  word_entropies = {}
+  variance = 0
+  prior_cumulative_entropy = 0
+  for word in word_frequency:
+    probability = float(word_frequency[word]) / len(word_frequency)
+    cumulative_entropy = (probability * log2(probability))
+    entropy_contribution = cumulative_entropy - prior_cumulative_entropy
+
+    word_entropies[word] = float(entropy_contribution) #take entropy of the final occurance of the word
+    variance += ((entropy_contribution - total_entropy)**significance)/len(word_frequency)
+    prior_cumulative_entropy = cumulative_entropy
+  std_dev = variance**(1/2)
+
+  meaningful_words = []
+  for word in word_entropies:
+    entropy = word_entropies[word]
+    if is_number(entropy) and not (entropy==0) :
+      if (float(entropy) + float(std_dev*2)) >= float(total_entropy): #significant
+        if not (word in meaningful_words):
+          meaningful_words.append(word) 
+
+  return meaningful_words
 
 
 def profile():
@@ -172,6 +246,14 @@ def main():
   SMOG = smog(complex_words, sentences)
   sys.stdout.write('SMOG: years of education needed to comprehend: %f\n' % (SMOG))
 
+  char_entropy = calcCharEntropy(content)
+  sys.stdout.write('Entropy: %f bits per character\n' % (-char_entropy))
+
+  word_entropy = calcWordEntropy(content)
+  sys.stdout.write('Entropy: %f bits per word\n' % (-word_entropy))
+
+  meaningful_words = meaningfulWords(content,2)
+  sys.stdout.write('Meaningful words %s\n' % meaningful_words)
 
 #profile()
 main()
