@@ -35,8 +35,7 @@ def tokenizeText(data):
 
 
 def wordToSyllablesDict(data):
-  #text = tokenizeText(data)
-  text = data.split()
+  text = tokenizeText(data)
   words = [w.lower() for w in text]
   regexp = "[A-Za-z]+"
   exp = re.compile(regexp)
@@ -61,8 +60,7 @@ def countSyllablesInWord(word, cmud):
 
 
 def countSyllablesInText(data,syllable_dictionary):
-  #text = tokenizeText(data)
-  text = data.split()
+  text = tokenizeText(data)
   words = [w.lower() for w in text]
 
   syllable_count = 0
@@ -74,8 +72,7 @@ def countSyllablesInText(data,syllable_dictionary):
 
 
 def countNSyllableWords(data,syllables,syllable_dictionary):
-  #text = tokenizeText(data)
-  text = data.split()
+  text = tokenizeText(data)
   words = [w.lower() for w in text]
 
   word_count=0
@@ -99,8 +96,7 @@ def countLetterFrequencies(data):
 
 def countWordFrequencies(data):
   word_frequency = {}
-  #words = nltk.word_tokenize(data)
-  words = data.split()
+  words = nltk.word_tokenize(data)
   for word in words:
       if word in word_frequency:
           word_frequency[word] += 1
@@ -111,15 +107,13 @@ def countWordFrequencies(data):
 
 def countWords(data):
   word_count = 0
-  #words = nltk.word_tokenize(data)
-  words = data.split()
+  words = nltk.word_tokenize(data)
   return len(words)
 
 
 def countSentences(data):
   sentence_count = 0
-  #sentences = nltk.sent_tokenize(data)
-  sentences = data.split('.')
+  sentences = nltk.sent_tokenize(data)
   return len(sentences) - 1
 
 
@@ -175,11 +169,18 @@ def calcWordEntropy(data):
     length_sum += probability * log2(probability)
   return length_sum
 
-#since entropy is cumulative, final word will always be returned
+#blind contextual classification of text
+#only language dependency is the tokenizer.  otherwise agnostic
 def meaningfulWords(data, significance):
   total_entropy = calcWordEntropy(data)
   word_frequency = countWordFrequencies(data)
-  
+
+  regexp = "[A-Za-z]+"
+  exp = re.compile(regexp)
+  for k, v in list(word_frequency.items()):
+    if not(exp.match(k)):
+      del word_frequency[k]
+
   word_entropies = {}
   variance = 0
   prior_cumulative_entropy = 0
@@ -194,6 +195,7 @@ def meaningfulWords(data, significance):
   std_dev = variance**(1/2)
 
   meaningful_words = []
+  word_entropies = dict(sorted(word_entropies.items(), key=lambda k: k[1], reverse=True))
   for word in word_entropies:
     entropy = word_entropies[word]
     if is_number(entropy) and not (entropy==0) :
