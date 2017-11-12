@@ -124,6 +124,7 @@ def kincaid(words, sentences, syllables):
 
 def ari(characters, words, sentences):
   # ARI = 4.71*(characters/words) + 0.5*(words/sentences) - 21.43
+  #https://en.wikipedia.org/wiki/Automated_readability_index
   return 4.71*(characters/words) + 0.5*(words/sentences) - 21.43
 
 
@@ -170,15 +171,16 @@ def calcWordEntropy(data):
   return length_sum
 
 #blind contextual classification of text
-#only language dependency is the tokenizer.  otherwise agnostic
+#should be easily generalizable to any language given a means of tokenization
 def meaningfulWords(data, significance):
   total_entropy = calcWordEntropy(data)
-  word_frequency = countWordFrequencies(data)
+  word_frequency = countWordFrequencies(data) #language depedent
 
+  #clean up noise -- language dependent
   regexp = "[A-Za-z]+"
   exp = re.compile(regexp)
   for k, v in list(word_frequency.items()):
-    if not(exp.match(k)):
+    if not(exp.match(k)) or len(k) < 5:
       del word_frequency[k]
 
   word_entropies = {}
@@ -189,9 +191,10 @@ def meaningfulWords(data, significance):
     cumulative_entropy = (probability * log2(probability))
     entropy_contribution = cumulative_entropy - prior_cumulative_entropy
 
-    word_entropies[word] = float(entropy_contribution) #take entropy of the final occurance of the word
-    variance += ((entropy_contribution - total_entropy)**significance)/len(word_frequency)
+    word_entropies[word] = float(entropy_contribution) #final occurance of the word will offer best information
+    variance += ((entropy_contribution - total_entropy)**2)
     prior_cumulative_entropy = cumulative_entropy
+  variance = variance/(len(data) - 1)
   std_dev = variance**(1/2)
 
   meaningful_words = []
@@ -199,7 +202,7 @@ def meaningfulWords(data, significance):
   for word in word_entropies:
     entropy = word_entropies[word]
     if is_number(entropy) and not (entropy==0) :
-      if (float(entropy) + float(std_dev*2)) >= float(total_entropy): #significant
+      if (float(entropy) + float(std_dev*significance)) >= float(total_entropy): #significant
         if not (word in meaningful_words):
           meaningful_words.append(word) 
 
