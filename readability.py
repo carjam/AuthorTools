@@ -171,6 +171,7 @@ def calcWordEntropy(data):
     length_sum += probability * log2(probability)
   return length_sum
 
+
 #blind contextual classification of text
 #should be generalizable to any language given a means of tokenization
 def meaningfulWords(data, significance):
@@ -255,9 +256,6 @@ def main():
 
   char_entropy = calcCharEntropy(content)
   sys.stdout.write('Entropy: %f bits per character\n' % (-char_entropy))
-
-  word_entropy = calcWordEntropy(content)
-  sys.stdout.write('Entropy: %f bits per word\n' % (-word_entropy))
 
   meaningful_words = meaningfulWords(content,1.25)
   sys.stdout.write('Meaningful words %s\n' % meaningful_words)
