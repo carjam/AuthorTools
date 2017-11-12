@@ -9,6 +9,7 @@ import nltk.data
 from math import log
 import pprint
 import sys
+import numpy
 
 # Function to compute the base-2 logarithm of a floating point number.
 def log2(number):
@@ -171,9 +172,9 @@ def calcWordEntropy(data):
   return length_sum
 
 #blind contextual classification of text
-#should be easily generalizable to any language given a means of tokenization
+#should be generalizable to any language given a means of tokenization
 def meaningfulWords(data, significance):
-  total_entropy = calcWordEntropy(data)
+  total_entropy = -calcWordEntropy(data)
   word_frequency = countWordFrequencies(data) #language depedent
 
   #clean up noise -- language dependent
@@ -184,25 +185,26 @@ def meaningfulWords(data, significance):
       del word_frequency[k]
 
   word_entropies = {}
-  variance = 0
   prior_cumulative_entropy = 0
+  cumulative_entropy = 0
   for word in word_frequency:
     probability = float(word_frequency[word]) / len(word_frequency)
-    cumulative_entropy = (probability * log2(probability))
+    cumulative_entropy -= (probability * log2(probability))
     entropy_contribution = cumulative_entropy - prior_cumulative_entropy
 
     word_entropies[word] = float(entropy_contribution) #final occurance of the word will offer best information
-    variance += ((entropy_contribution - total_entropy)**2)
     prior_cumulative_entropy = cumulative_entropy
-  variance = variance/(len(data) - 1)
-  std_dev = variance**(1/2)
+
+  entropies = list(word_entropies.values())
+  mean = numpy.mean(entropies, axis=0)
+  std_dev = numpy.std(entropies, axis=0)
 
   meaningful_words = []
   word_entropies = dict(sorted(word_entropies.items(), key=lambda k: k[1], reverse=True))
   for word in word_entropies:
     entropy = word_entropies[word]
     if is_number(entropy) and not (entropy==0) :
-      if (float(entropy) + float(std_dev*significance)) >= float(total_entropy): #significant
+      if (float(mean) + float(std_dev*significance)) <= float(entropy):
         if not (word in meaningful_words):
           meaningful_words.append(word) 
 
@@ -257,7 +259,7 @@ def main():
   word_entropy = calcWordEntropy(content)
   sys.stdout.write('Entropy: %f bits per word\n' % (-word_entropy))
 
-  meaningful_words = meaningfulWords(content,2)
+  meaningful_words = meaningfulWords(content,1.25)
   sys.stdout.write('Meaningful words %s\n' % meaningful_words)
 
 #profile()
