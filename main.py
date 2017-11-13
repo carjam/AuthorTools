@@ -47,7 +47,7 @@ def main():
   #document description
   describe = TextDescribe(content)
   char_entropy = describe.calcCharEntropy()
-  sys.stdout.write('Entropy: %f bits per character\n' % (-char_entropy))
+  sys.stdout.write('Entropy: %f bits per character\n' % (char_entropy))
 
   diversity = describe.calcDiversityScore()
   sys.stdout.write('Word diversity: %f\n' % (diversity))
