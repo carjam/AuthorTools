@@ -4,15 +4,17 @@ import re
 from math import log
 import numpy
 
-class TextDescribe:
+class TextDescribe(object):
+  def __init__(self,text):
+    self.__text = text.lower().strip()
+
+
   # Function to compute the base-2 logarithm of a floating point number.
-  @classmethod
-  def __log2(cls,number):
+  def __log2(self,number):
     return log(number) / log(2)
 
 
-  @classmethod 
-  def __is_number(cls,s):
+  def __is_number(self,s):
     try:
         float(s)
         return True
@@ -20,35 +22,29 @@ class TextDescribe:
         return False
 
 
-  @classmethod  
-  def calcCharEntropy(cls,text):
-    data = text.lower().strip()
-    letter_frequency = TextUtility.countLetterFrequencies(data)
+  def calcCharEntropy(self):
+    letter_frequency = TextUtility.countLetterFrequencies(self.__text)
     length_sum = 0.0
     for letter in letter_frequency:
-      probability = float(letter_frequency[letter]) / len(data)
-      length_sum += probability * cls.__log2(probability)
+      probability = float(letter_frequency[letter]) / len(self.__text)
+      length_sum += probability * self.__log2(probability)
     return length_sum
 
 
-  @classmethod
-  def calcWordEntropy(cls,text):
-    data = text.lower().strip()
-    word_frequency = TextUtility.countWordFrequencies(data)
+  def calcWordEntropy(self):
+    word_frequency = TextUtility.countWordFrequencies(self.__text)
     length_sum = 0.0
     for word in word_frequency:
       probability = float(word_frequency[word]) / len(word_frequency)
-      length_sum += probability * cls.__log2(probability)
+      length_sum += probability * self.__log2(probability)
     return length_sum
 
 
   #blind contextual classification of text
   #should be generalizable to any language given a means of tokenization
-  @classmethod
-  def meaningfulWords(cls,text, significance):
-    data = text.lower().strip()
-    total_entropy = -cls.calcWordEntropy(data)
-    word_frequency = TextUtility.countWordFrequencies(data) #language depedent
+  def meaningfulWords(self,significance):
+    total_entropy = -self.calcWordEntropy()
+    word_frequency = TextUtility.countWordFrequencies(self.__text) #language depedent
   
     #clean up noise -- language dependent
     regexp = "[A-Za-z]+"
@@ -62,7 +58,7 @@ class TextDescribe:
     cumulative_entropy = 0
     for word in word_frequency:
       probability = float(word_frequency[word]) / len(word_frequency)
-      cumulative_entropy -= (probability * cls.__log2(probability))
+      cumulative_entropy -= (probability * self.__log2(probability))
       entropy_contribution = cumulative_entropy - prior_cumulative_entropy
   
       word_entropies[word] = float(entropy_contribution) #final occurance of the word will offer best information
@@ -76,7 +72,7 @@ class TextDescribe:
     word_entropies = dict(sorted(word_entropies.items(), key=lambda k: k[1], reverse=True))
     for word in word_entropies:
       entropy = word_entropies[word]
-      if cls.__is_number(entropy) and not (entropy==0) :
+      if self.__is_number(entropy) and not (entropy==0) :
         if (float(mean) + float(std_dev*significance)) <= float(entropy):
           if not (word in meaningful_words):
             meaningful_words.append(word) 

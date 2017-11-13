@@ -44,10 +44,11 @@ def main():
   sys.stdout.write('SMOG: years of education needed to comprehend: %f\n' % (SMOG))
 
   #document description
-  char_entropy = TextDescribe.calcCharEntropy(content)
+  describe = TextDescribe(content)
+  char_entropy = describe.calcCharEntropy()
   sys.stdout.write('Entropy: %f bits per character\n' % (-char_entropy))
 
-  meaningful_words = TextDescribe.meaningfulWords(content,1.25)
+  meaningful_words = describe.meaningfulWords(1.25)
   sys.stdout.write('Meaningful words %s\n' % meaningful_words)
 
 #profile()
