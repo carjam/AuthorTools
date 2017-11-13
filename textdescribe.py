@@ -2,6 +2,7 @@
 from textutility import TextUtility
 import re
 from math import log
+from math import e
 import numpy
 
 class TextDescribe(object):
@@ -26,21 +27,29 @@ class TextDescribe(object):
     letter_frequency = TextUtility.countLetterFrequencies(self.__text)
     length_sum = 0.0
     for letter in letter_frequency:
-      probability = float(letter_frequency[letter]) / len(self.__text)
-      length_sum += probability * self.__log2(probability)
+      probability = float(letter_frequency[letter]) / sum(letter_frequency.values())
+      length_sum -= probability * self.__log2(probability)
     return length_sum
 
 
   def calcWordEntropy(self):
     word_frequency = TextUtility.countWordFrequencies(self.__text)
     length_sum = 0.0
-    for word in word_frequency:
-      probability = float(word_frequency[word]) / len(word_frequency)
-      length_sum += probability * self.__log2(probability)
+    for word in word_frequency.keys():
+      probability = float(word_frequency[word]) / sum(word_frequency.values())
+      length_sum -= probability * self.__log2(probability)
     return length_sum
 
 
-  def __calculateEntropyContributionPerWord(self):
+  #def calcDiversityScore(self): #Shannon equitability index
+  #    word_frequency = TextUtility.countWordFrequencies(self.__text)
+  #    k = len(word_frequency.keys())
+  #    n = sum(word_frequency.values())
+  #    #return(((n * log(n) - self.calcWordEntropy())/n)/log(k)
+  #    return self.calcWordEntropy()/log(k)
+
+
+  def __calculateWordProbabilities(self):
     word_frequency = TextUtility.countWordFrequencies(self.__text) #language depedent
 
     #clean up noise -- language dependent
@@ -51,70 +60,72 @@ class TextDescribe(object):
       if not(exp.match(k)) or len(k) < MIN_CHARS:
         del word_frequency[k]
 
-    word_entropies = {}
-    prior_cumulative_entropy = 0
-    cumulative_entropy = 0
-    for word in word_frequency:
-      probability = float(word_frequency[word]) / len(word_frequency)
-      cumulative_entropy -= (probability * self.__log2(probability))
-      entropy_contribution = cumulative_entropy - prior_cumulative_entropy
+    word_probabilities = {}
+    for word in word_frequency.keys():
+      entropy_contribution = float(word_frequency[word]) / sum(word_frequency.values()) 
+      word_probabilities[word] = float(entropy_contribution) #final occurance of the word will offer best information
 
-      word_entropies[word] = float(entropy_contribution) #final occurance of the word will offer best information
-      prior_cumulative_entropy = cumulative_entropy
-
-    return word_entropies
+    return word_probabilities
 
 
   #extract words with high information
-  def highInfoWords(self,significance):
-    word_entropies = self.__calculateEntropyContributionPerWord()
+  def probableWords(self,significance):
+    word_probabilities = self.__calculateWordProbabilities()
 
     #get stats on entropies
-    entropies = list(word_entropies.values())
-    mean = numpy.mean(entropies, axis=0)
-    std_dev = numpy.std(entropies, axis=0)
+    probabilities = list(word_probabilities.values())
+    mean = numpy.mean(probabilities, axis=0)
+    std_dev = numpy.std(probabilities, axis=0)
 
     highinfo_words = []
-    word_entropies = dict(sorted(word_entropies.items(), key=lambda k: k[1], reverse=True))
-    for word in word_entropies:
-      entropy = word_entropies[word]
-      if self.__is_number(entropy) and not (entropy==0) :
-        if (float(mean) + float(std_dev*significance)) >= float(entropy):
+    word_probabilities = dict(sorted(word_probabilities.items(), key=lambda k: k[1], reverse=True))
+    for word in word_probabilities:
+      probability = word_probabilities[word]
+      if self.__is_number(probability) and not (probability > 0) :
+        if (float(mean) + float(std_dev*significance)) >= float(probability):
           highinfo_words.append(word) 
 
     return set(highinfo_words)
 
 
   #extract words with low information
-  def lowInfoWords(self,significance):
-    word_entropies = self.__calculateEntropyContributionPerWord()
+  def unlikelyWords(self,significance):
+    word_probabilities = self.__calculateWordProbabilities()
 
-    #get stats on entropies
-    entropies = list(word_entropies.values())
-    mean = numpy.mean(entropies, axis=0)
-    std_dev = numpy.std(entropies, axis=0)
+    #get stats on probabilities
+    probabilities = list(word_probabilities.values())
+    mean = numpy.mean(probabilities, axis=0)
+    std_dev = numpy.std(probabilities, axis=0)
 
     lowinfo_words = []
-    word_entropies = dict(sorted(word_entropies.items(), key=lambda k: k[1], reverse=True))
-    for word in word_entropies:
-      entropy = word_entropies[word]
-      if self.__is_number(entropy) and not (entropy==0) :
-        if (float(mean) + float(std_dev*significance)) < float(entropy):
+    word_probabilities = dict(sorted(word_probabilities.items(), key=lambda k: k[1], reverse=True))
+    for word in word_probabilities:
+      probability = word_probabilities[word]
+      if self.__is_number(probability) and not (probability==0) :
+        if (float(mean) + float(std_dev*significance)) < float(probability):
           lowinfo_words.append(word) 
 
     return set(lowinfo_words)
 
  
   def hashtagSuggestions(self,significance):
-    hashtags = list(self.lowInfoWords(significance))
+    hashtags = list(self.unlikelyWords(significance))
     hashtags[:] = ['#' + word for word in hashtags]
     return hashtags
 
 
   def summary(self,significance):
     sentences = TextUtility.sentenceTokenizeText(self.__text)
-    low_info_words = self.lowInfoWords(significance)
-    result=()
-    for word in low_info_words:
-       result = (sentence for sentence in sentences if word in sentence)
-    return list(result)
+    words = self.unlikelyWords(significance)
+    result=[]
+    for sentence in sentences:
+      word_match = 0
+      for word in words:
+        if word in sentence:
+          word_match += 1
+          if word_match > 2 and len(sentence) < 150 and sentence not in result:
+            result.append(sentence)
+    
+    if len(result) == 0:
+      result.append('None available')
+    return result

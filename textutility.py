@@ -125,7 +125,7 @@ class TextUtility:
   def countWords(cls,data):
     word_count = 0
     words = nltk.word_tokenize(data)
-    return len(words)
+    return len(words) - 1
 
 
   @classmethod
