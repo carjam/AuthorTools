@@ -8,7 +8,7 @@ class TextDescribe(object):
   def __init__(self,text):
     self.__text = text.lower().strip()
 
-
+  
   # Function to compute the base-2 logarithm of a floating point number.
   def __log2(self,number):
     return log(number) / log(2)
@@ -40,9 +40,17 @@ class TextDescribe(object):
     return length_sum
 
 
-  def __calculateEntropyContributionPerWord(self, word_frequency):
+  def __calculateEntropyContributionPerWord(self):
+    word_frequency = TextUtility.countWordFrequencies(self.__text) #language depedent
 
-    #calculate entropy contribution per word
+    #clean up noise -- language dependent
+    MIN_CHARS = 5
+    regexp = "[A-Za-z]+"
+    exp = re.compile(regexp)
+    for k, v in list(word_frequency.items()):
+      if not(exp.match(k)) or len(k) < MIN_CHARS:
+        del word_frequency[k]
+
     word_entropies = {}
     prior_cumulative_entropy = 0
     cumulative_entropy = 0
@@ -58,50 +66,28 @@ class TextDescribe(object):
 
 
   #extract words with high information
-  def meaningfulWords(self,significance):
-    MIN_SYLLABLES = 4
-
-    total_entropy = -self.calcWordEntropy()
-    word_frequency = TextUtility.countWordFrequencies(self.__text) #language depedent
-
-    #clean up noise -- language dependent
-    regexp = "[A-Za-z]+"
-    exp = re.compile(regexp)
-    for k, v in list(word_frequency.items()):
-      if not(exp.match(k)) or len(k) < MIN_SYLLABLES:
-        del word_frequency[k]
-
-    word_entropies = self.__calculateEntropyContributionPerWord(word_frequency)
+  def highInfoWords(self,significance):
+    word_entropies = self.__calculateEntropyContributionPerWord()
 
     #get stats on entropies
     entropies = list(word_entropies.values())
     mean = numpy.mean(entropies, axis=0)
     std_dev = numpy.std(entropies, axis=0)
 
-    meaningful_words = []
+    highinfo_words = []
     word_entropies = dict(sorted(word_entropies.items(), key=lambda k: k[1], reverse=True))
     for word in word_entropies:
       entropy = word_entropies[word]
       if self.__is_number(entropy) and not (entropy==0) :
-        if (float(mean) + float(std_dev*significance)) <= float(entropy):
-          if not (word in meaningful_words):
-            meaningful_words.append(word) 
+        if (float(mean) + float(std_dev*significance)) >= float(entropy):
+          highinfo_words.append(word) 
 
-    return set(meaningful_words)
+    return set(highinfo_words)
+
 
   #extract words with low information
   def lowInfoWords(self,significance):
-    total_entropy = -self.calcWordEntropy()
-    word_frequency = TextUtility.countWordFrequencies(self.__text) #language depedent
-
-    #clean up noise -- language dependent
-    regexp = "[A-Za-z]+"
-    exp = re.compile(regexp)
-    for k, v in list(word_frequency.items()):
-      if not(exp.match(k)):
-        del word_frequency[k]
-
-    word_entropies = self.__calculateEntropyContributionPerWord(word_frequency)
+    word_entropies = self.__calculateEntropyContributionPerWord()
 
     #get stats on entropies
     entropies = list(word_entropies.values())
@@ -113,9 +99,22 @@ class TextDescribe(object):
     for word in word_entropies:
       entropy = word_entropies[word]
       if self.__is_number(entropy) and not (entropy==0) :
-        if (float(mean) + float(std_dev*significance)) > float(entropy):
-          if not (word in lowinfo_words):
-            lowinfo_words.append(word) 
+        if (float(mean) + float(std_dev*significance)) < float(entropy):
+          lowinfo_words.append(word) 
 
     return set(lowinfo_words)
 
+ 
+  def hashtagSuggestions(self,significance):
+    hashtags = list(self.lowInfoWords(significance))
+    hashtags[:] = ['#' + word for word in hashtags]
+    return hashtags
+
+
+  def summary(self,significance):
+    sentences = TextUtility.sentenceTokenizeText(self.__text)
+    low_info_words = self.lowInfoWords(significance)
+    result=()
+    for word in low_info_words:
+       result = (sentence for sentence in sentences if word in sentence)
+    return list(result)

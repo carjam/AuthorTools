@@ -49,11 +49,14 @@ def main():
   char_entropy = describe.calcCharEntropy()
   sys.stdout.write('Entropy: %f bits per character\n' % (-char_entropy))
 
-  meaningful_words = describe.meaningfulWords(1.25)
-  sys.stdout.write('Meaningful words %s\n' % meaningful_words)
+  hashtags = describe.hashtagSuggestions(2.5)
+  sys.stdout.write('Hashtag suggestions %s\n' % hashtags)
   
-  lowinfo_words = describe.lowInfoWords(1.25)
-  sys.stdout.write('\n\nLow info words %s\n' % lowinfo_words)
+  highinfo_words = describe.highInfoWords(2.5)
+  sys.stdout.write('\n\nHigh info words %s\n' % highinfo_words)
+
+  summary = describe.summary(2.5)
+  sys.stdout.write('\n\nSummary %s\n' % summary)
 
 #profile()
 main()

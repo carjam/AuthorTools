@@ -29,6 +29,11 @@ class TextUtility:
     return nltk.Text(tokens)
 
 
+  @classmethod
+  def sentenceTokenizeText(cls,data):
+    return nltk.sent_tokenize(data)
+
+
   @classmethod 
   def wordToSyllablesDict(cls,data):
     text = cls.tokenizeText(data)
