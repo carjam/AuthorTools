@@ -51,6 +51,9 @@ def main():
 
   meaningful_words = describe.meaningfulWords(1.25)
   sys.stdout.write('Meaningful words %s\n' % meaningful_words)
+  
+  lowinfo_words = describe.lowInfoWords(1.25)
+  sys.stdout.write('\n\nLow info words %s\n' % lowinfo_words)
 
 #profile()
 main()

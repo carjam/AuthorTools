@@ -73,7 +73,7 @@ class TextUtility:
 
 
   @classmethod 
-  def countNSyllableWords(cls,data,numSyllables):
+  def getNSyllableWords(cls,data,numSyllables):
     text = cls.tokenizeText(data)
     words = [w.lower() for w in text]
 
@@ -83,9 +83,14 @@ class TextUtility:
     for word in words:
         if word in syllable_dictionary:
           if syllable_dictionary[word] > numSyllables:
-            word_count += 1
- 
-    return word_count
+            del syllable_dictionary[word]
+
+    return syllable_dictionary
+
+
+  @classmethod 
+  def countNSyllableWords(cls,data,numSyllables):
+    return len(cls.getNSyllableWords(data,numSyllables).keys())
 
 
   @classmethod  
