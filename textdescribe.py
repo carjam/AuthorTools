@@ -69,18 +69,18 @@ class TextDescribe(object):
 
 
   #extract words with high information
-  def highInfoWords(self,significance):
-    word_entropies = self.__calculateWordProbabilities()
+  def probableWords(self,significance):
+    word_probabilities = self.__calculateWordProbabilities()
 
     #get stats on entropies
-    entropies = list(word_entropies.values())
-    mean = numpy.mean(entropies, axis=0)
-    std_dev = numpy.std(entropies, axis=0)
+    probabilities = list(word_probabilities.values())
+    mean = numpy.mean(probabilities, axis=0)
+    std_dev = numpy.std(probabilities, axis=0)
 
     highinfo_words = []
-    word_entropies = dict(sorted(word_entropies.items(), key=lambda k: k[1], reverse=True))
-    for word in word_entropies:
-      entropy = word_entropies[word]
+    word_probabilities = dict(sorted(word_probabilities.items(), key=lambda k: k[1], reverse=True))
+    for word in word_probabilities:
+      entropy = word_probabilities[word]
       if self.__is_number(entropy) and not (entropy==0) :
         if (float(mean) + float(std_dev*significance)) >= float(entropy):
           highinfo_words.append(word) 
@@ -89,18 +89,18 @@ class TextDescribe(object):
 
 
   #extract words with low information
-  def lowInfoWords(self,significance):
-    word_entropies = self.__calculateWordProbabilities()
+  def unlikelyWords(self,significance):
+    word_probabilities = self.__calculateWordProbabilities()
 
-    #get stats on entropies
-    entropies = list(word_entropies.values())
-    mean = numpy.mean(entropies, axis=0)
-    std_dev = numpy.std(entropies, axis=0)
+    #get stats on probabilities
+    probabilities = list(word_probabilities.values())
+    mean = numpy.mean(probabilities, axis=0)
+    std_dev = numpy.std(probabilities, axis=0)
 
     lowinfo_words = []
-    word_entropies = dict(sorted(word_entropies.items(), key=lambda k: k[1], reverse=True))
-    for word in word_entropies:
-      entropy = word_entropies[word]
+    word_probabilities = dict(sorted(word_probabilities.items(), key=lambda k: k[1], reverse=True))
+    for word in word_probabilities:
+      entropy = word_probabilities[word]
       if self.__is_number(entropy) and not (entropy==0) :
         if (float(mean) + float(std_dev*significance)) < float(entropy):
           lowinfo_words.append(word) 
@@ -109,15 +109,20 @@ class TextDescribe(object):
 
  
   def hashtagSuggestions(self,significance):
-    hashtags = list(self.lowInfoWords(significance))
+    hashtags = list(self.unlikelyWords(significance))
     hashtags[:] = ['#' + word for word in hashtags]
     return hashtags
 
 
   def summary(self,significance):
     sentences = TextUtility.sentenceTokenizeText(self.__text)
-    low_info_words = self.lowInfoWords(significance)
-    result=()
-    for word in low_info_words:
-       result = (sentence for sentence in sentences if word in sentence)
-    return list(result)
+    words = self.unlikelyWords(significance)
+    result=[]
+    for sentence in sentences:
+      word_match = 0
+      for word in words:
+        if word in sentence:
+          word_match += 1
+          if word_match > 3 and len(sentence) < 150 and sentence not in result:
+            result.append(sentence)
+    return result

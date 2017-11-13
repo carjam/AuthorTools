@@ -55,8 +55,8 @@ def main():
   hashtags = describe.hashtagSuggestions(2.5)
   sys.stdout.write('Hashtag suggestions %s\n' % hashtags)
   
-  highinfo_words = describe.highInfoWords(2.5)
-  sys.stdout.write('\n\nHigh info words %s\n' % highinfo_words)
+  probable_words = describe.probableWords(2.5)
+  sys.stdout.write('\n\nProbable words %s\n' % probable_words)
 
   summary = describe.summary(2.5)
   sys.stdout.write('\n\nSummary %s\n' % summary)
