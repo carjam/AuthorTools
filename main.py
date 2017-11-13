@@ -1,8 +1,8 @@
 #!/usr/local/bin/python3
 import sys
-from TextUtility import TextUtility
-import TextDescribe
-import Readability
+from textutility import TextUtility
+from textdescribe import TextDescribe
+from readability import Readability
 
 def profile():
   import cProfile

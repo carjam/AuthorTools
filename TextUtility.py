@@ -6,21 +6,24 @@ nltk.download('punkt')
 from curses.ascii import isdigit
 from nltk.corpus import cmudict
 import nltk.data
-from Memoized import memoized
+from memoized import memoized
 
 class TextUtility:
 
+  @classmethod
   @memoized
-  def __getCMUDict(*args):
+  def __getCMUDict(cls,*args):
     return cmudict.dict()
 
 
-  def normalizeText(data):
+  @classmethod
+  def normalizeText(cls,data):
     cleaner = re.compile('[^a-z]+')
     return cleaner.sub(' ',data)
-  
-  
-  def tokenizeText(data):
+ 
+
+  @classmethod
+  def tokenizeText(cls,data):
     tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
     tokens = nltk.wordpunct_tokenize(data)
     return nltk.Text(tokens)
@@ -52,7 +55,8 @@ class TextUtility:
       return 0
     else:
       return max([len([y for y in x if isdigit(y[-1])]) for x in cmud[lowercase]])
-  
+
+
   @classmethod 
   def countSyllablesInText(cls,data):
     text = cls.tokenizeText(data)
@@ -66,7 +70,8 @@ class TextUtility:
           syllable_count += syllable_dictionary[word]
   
     return syllable_count
-  
+
+
   @classmethod 
   def countNSyllableWords(cls,data,numSyllables):
     text = cls.tokenizeText(data)
@@ -82,8 +87,9 @@ class TextUtility:
   
     return word_count
   
-  
-  def countLetterFrequencies(data):
+
+  @classmethod  
+  def countLetterFrequencies(cls,data):
     letter_frequency = {}
     for letter in data:
         if letter in letter_frequency:
@@ -92,8 +98,9 @@ class TextUtility:
             letter_frequency[letter] = 1
     return letter_frequency
   
-  
-  def countWordFrequencies(data):
+
+  @classmethod
+  def countWordFrequencies(cls,data):
     word_frequency = {}
     words = nltk.word_tokenize(data)
     for word in words:
@@ -104,13 +111,15 @@ class TextUtility:
     return word_frequency
   
   
-  def countWords(data):
+  @classmethod
+  def countWords(cls,data):
     word_count = 0
     words = nltk.word_tokenize(data)
     return len(words)
   
   
-  def countSentences(data):
+  @classmethod
+  def countSentences(cls,data):
     sentence_count = 0
     sentences = nltk.sent_tokenize(data)
     return len(sentences) - 1
