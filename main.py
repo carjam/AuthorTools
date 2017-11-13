@@ -25,30 +25,38 @@ def main():
   sys.stdout.write('Letters: %i\n' % (characters))
 
   #Readability measures
-  Kincaid = Readability.kincaid(content)
+  readability = Readability(content)
+  Kincaid = readability.kincaid()
   sys.stdout.write('Kincaid (school grade level): %f\n' % (Kincaid))
   
-  ARI_score = Readability.ari(content)
+  ARI_score = readability.ari()
   sys.stdout.write('ARI (school grade level): %f\n' % (ARI_score))
   
-  ColemanLiau = Readability.colemanLiau(content)
+  ColemanLiau = readability.colemanLiau()
   sys.stdout.write('ColemanLiau (school grade level): %f\n' % (ColemanLiau))
   
-  Flesch = Readability.flesch(content)
+  Flesch = readability.flesch()
   sys.stdout.write('Flesch: 0=12th grade, 100=4th grade %f\n' % (Flesch))
   
-  Fog = Readability.fog(content)
+  Fog = readability.fog()
   sys.stdout.write('Fog: grade level: %f\n' % (Fog))
   
-  SMOG = Readability.smog(content)
+  SMOG = readability.smog()
   sys.stdout.write('SMOG: years of education needed to comprehend: %f\n' % (SMOG))
 
   #document description
-  char_entropy = TextDescribe.calcCharEntropy(content)
+  describe = TextDescribe(content)
+  char_entropy = describe.calcCharEntropy()
   sys.stdout.write('Entropy: %f bits per character\n' % (-char_entropy))
 
-  meaningful_words = TextDescribe.meaningfulWords(content,1.25)
-  sys.stdout.write('Meaningful words %s\n' % meaningful_words)
+  hashtags = describe.hashtagSuggestions(2.5)
+  sys.stdout.write('Hashtag suggestions %s\n' % hashtags)
+  
+  highinfo_words = describe.highInfoWords(2.5)
+  sys.stdout.write('\n\nHigh info words %s\n' % highinfo_words)
+
+  summary = describe.summary(2.5)
+  sys.stdout.write('\n\nSummary %s\n' % summary)
 
 #profile()
 main()
