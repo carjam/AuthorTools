@@ -41,12 +41,12 @@ class TextDescribe(object):
     return length_sum
 
 
-  def calcDiversityScore(self): #Shannon equitability index
-      word_frequency = TextUtility.countWordFrequencies(self.__text)
-      k = len(word_frequency.keys())
-      n = sum(word_frequency.values())
-      return ((n * log(n) - self.calcWordEntropy())/n)/log(k)
-      #return self.calcWordEntropy()
+  #def calcDiversityScore(self): #Shannon equitability index
+  #    word_frequency = TextUtility.countWordFrequencies(self.__text)
+  #    k = len(word_frequency.keys())
+  #    n = sum(word_frequency.values())
+  #    #return(((n * log(n) - self.calcWordEntropy())/n)/log(k)
+  #    return self.calcWordEntropy()/log(k)
 
 
   def __calculateWordProbabilities(self):
@@ -80,9 +80,9 @@ class TextDescribe(object):
     highinfo_words = []
     word_probabilities = dict(sorted(word_probabilities.items(), key=lambda k: k[1], reverse=True))
     for word in word_probabilities:
-      entropy = word_probabilities[word]
-      if self.__is_number(entropy) and not (entropy==0) :
-        if (float(mean) + float(std_dev*significance)) >= float(entropy):
+      probability = word_probabilities[word]
+      if self.__is_number(probability) and not (probability > 0) :
+        if (float(mean) + float(std_dev*significance)) >= float(probability):
           highinfo_words.append(word) 
 
     return set(highinfo_words)
@@ -100,9 +100,9 @@ class TextDescribe(object):
     lowinfo_words = []
     word_probabilities = dict(sorted(word_probabilities.items(), key=lambda k: k[1], reverse=True))
     for word in word_probabilities:
-      entropy = word_probabilities[word]
-      if self.__is_number(entropy) and not (entropy==0) :
-        if (float(mean) + float(std_dev*significance)) < float(entropy):
+      probability = word_probabilities[word]
+      if self.__is_number(probability) and not (probability==0) :
+        if (float(mean) + float(std_dev*significance)) < float(probability):
           lowinfo_words.append(word) 
 
     return set(lowinfo_words)
@@ -123,6 +123,9 @@ class TextDescribe(object):
       for word in words:
         if word in sentence:
           word_match += 1
-          if word_match > 3 and len(sentence) < 150 and sentence not in result:
+          if word_match > 2 and len(sentence) < 150 and sentence not in result:
             result.append(sentence)
+    
+    if len(result) == 0:
+      result.append('None available')
     return result
