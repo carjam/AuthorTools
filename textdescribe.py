@@ -59,6 +59,8 @@ class TextDescribe(object):
 
   #extract words with high information
   def meaningfulWords(self,significance):
+    MIN_SYLLABLES = 4
+
     total_entropy = -self.calcWordEntropy()
     word_frequency = TextUtility.countWordFrequencies(self.__text) #language depedent
 
@@ -66,7 +68,7 @@ class TextDescribe(object):
     regexp = "[A-Za-z]+"
     exp = re.compile(regexp)
     for k, v in list(word_frequency.items()):
-      if not(exp.match(k)) or len(k) < 5:
+      if not(exp.match(k)) or len(k) < MIN_SYLLABLES:
         del word_frequency[k]
 
     word_entropies = self.__calculateEntropyContributionPerWord(word_frequency)
@@ -98,7 +100,7 @@ class TextDescribe(object):
     for k, v in list(word_frequency.items()):
       if not(exp.match(k)):
         del word_frequency[k]
-    
+
     word_entropies = self.__calculateEntropyContributionPerWord(word_frequency)
 
     #get stats on entropies
