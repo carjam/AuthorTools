@@ -2,6 +2,7 @@
 from textutility import TextUtility
 import re
 from math import log
+from math import e
 import numpy
 
 class TextDescribe(object):
@@ -38,6 +39,13 @@ class TextDescribe(object):
       probability = float(word_frequency[word]) / len(word_frequency)
       length_sum += probability * self.__log2(probability)
     return length_sum
+
+
+  def calcDiversityScore(self): #Shannon equitability index
+      word_frequency = TextUtility.countWordFrequencies(self.__text)
+      k = len(word_frequency.keys())
+      n = TextUtility.countWords(self.__text)
+      return ((n * log(n) - self.calcWordEntropy())/n)/log(k)
 
 
   def __calculateEntropyContributionPerWord(self):

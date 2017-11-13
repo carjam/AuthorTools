@@ -49,6 +49,9 @@ def main():
   char_entropy = describe.calcCharEntropy()
   sys.stdout.write('Entropy: %f bits per character\n' % (-char_entropy))
 
+  diversity = describe.calcDiversityScore()
+  sys.stdout.write('Word diversity: %f\n' % (diversity))
+
   hashtags = describe.hashtagSuggestions(2.5)
   sys.stdout.write('Hashtag suggestions %s\n' % hashtags)
   
