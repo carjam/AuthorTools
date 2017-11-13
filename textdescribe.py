@@ -9,7 +9,8 @@ class TextDescribe:
   @classmethod
   def __log2(cls,number):
     return log(number) / log(2)
-  
+
+
   @classmethod 
   def __is_number(cls,s):
     try:
@@ -17,7 +18,8 @@ class TextDescribe:
         return True
     except ValueError:
         return False
-  
+
+
   @classmethod  
   def calcCharEntropy(cls,text):
     data = text.lower().strip()
@@ -27,7 +29,8 @@ class TextDescribe:
       probability = float(letter_frequency[letter]) / len(data)
       length_sum += probability * cls.__log2(probability)
     return length_sum
-  
+
+
   @classmethod
   def calcWordEntropy(cls,text):
     data = text.lower().strip()
@@ -37,8 +40,8 @@ class TextDescribe:
       probability = float(word_frequency[word]) / len(word_frequency)
       length_sum += probability * cls.__log2(probability)
     return length_sum
-  
-  
+
+
   #blind contextual classification of text
   #should be generalizable to any language given a means of tokenization
   @classmethod
