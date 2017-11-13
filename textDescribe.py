@@ -1,5 +1,5 @@
 #!/usr/local/bin/python3
-import textUtilities
+from TextUtility import TextUtility
 import re
 from math import log
 import numpy
@@ -20,7 +20,7 @@ def is_number(s):
 
 def calcCharEntropy(text):
   data = text.lower().strip()
-  letter_frequency = textUtilities.countLetterFrequencies(data)
+  letter_frequency = TextUtility.countLetterFrequencies(data)
   length_sum = 0.0
   for letter in letter_frequency:
     probability = float(letter_frequency[letter]) / len(data)
@@ -30,7 +30,7 @@ def calcCharEntropy(text):
 
 def calcWordEntropy(text):
   data = text.lower().strip()
-  word_frequency = textUtilities.countWordFrequencies(data)
+  word_frequency = TextUtility.countWordFrequencies(data)
   length_sum = 0.0
   for word in word_frequency:
     probability = float(word_frequency[word]) / len(word_frequency)
@@ -43,7 +43,7 @@ def calcWordEntropy(text):
 def meaningfulWords(text, significance):
   data = text.lower().strip()
   total_entropy = -calcWordEntropy(data)
-  word_frequency = textUtilities.countWordFrequencies(data) #language depedent
+  word_frequency = TextUtility.countWordFrequencies(data) #language depedent
 
   #clean up noise -- language dependent
   regexp = "[A-Za-z]+"
