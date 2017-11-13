@@ -40,16 +40,7 @@ class TextDescribe(object):
     return length_sum
 
 
-  def __calculateEntropyContributionPerWord(self,significance):
-    total_entropy = -self.calcWordEntropy()
-    word_frequency = TextUtility.countWordFrequencies(self.__text) #language depedent
-
-    #clean up noise -- language dependent
-    regexp = "[A-Za-z]+"
-    exp = re.compile(regexp)
-    for k, v in list(word_frequency.items()):
-      if not(exp.match(k)) or len(k) < 5:
-        del word_frequency[k]
+  def __calculateEntropyContributionPerWord(self, word_frequency):
 
     #calculate entropy contribution per word
     word_entropies = {}
@@ -68,7 +59,17 @@ class TextDescribe(object):
 
   #extract words with high information
   def meaningfulWords(self,significance):
-    word_entropies = self.__calculateEntropyContributionPerWord(significance)
+    total_entropy = -self.calcWordEntropy()
+    word_frequency = TextUtility.countWordFrequencies(self.__text) #language depedent
+
+    #clean up noise -- language dependent
+    regexp = "[A-Za-z]+"
+    exp = re.compile(regexp)
+    for k, v in list(word_frequency.items()):
+      if not(exp.match(k)) or len(k) < 5:
+        del word_frequency[k]
+
+    word_entropies = self.__calculateEntropyContributionPerWord(word_frequency)
 
     #get stats on entropies
     entropies = list(word_entropies.values())
@@ -88,7 +89,17 @@ class TextDescribe(object):
 
   #extract words with low information
   def lowInfoWords(self,significance):
-    word_entropies = self.__calculateEntropyContributionPerWord(significance)
+    total_entropy = -self.calcWordEntropy()
+    word_frequency = TextUtility.countWordFrequencies(self.__text) #language depedent
+
+    #clean up noise -- language dependent
+    regexp = "[A-Za-z]+"
+    exp = re.compile(regexp)
+    for k, v in list(word_frequency.items()):
+      if not(exp.match(k)):
+        del word_frequency[k]
+    
+    word_entropies = self.__calculateEntropyContributionPerWord(word_frequency)
 
     #get stats on entropies
     entropies = list(word_entropies.values())
