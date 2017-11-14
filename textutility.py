@@ -3,10 +3,13 @@ import re
 import nltk #http://www.nltk.org/
 nltk.download('cmudict')
 nltk.download('punkt')
-from curses.ascii import isdigit
+nltk.download('wordnet')
 from nltk.corpus import cmudict
 import nltk.data
+from nltk.corpus import wordnet
+from curses.ascii import isdigit
 from memoized import memoized
+from itertools import chain
 
 class TextUtility:
 
@@ -133,4 +136,10 @@ class TextUtility:
     sentence_count = 0
     sentences = nltk.sent_tokenize(data)
     return len(sentences) - 1
+
+
+  @classmethod
+  def getSynonyms(cls,word):
+    sysnet_syns = wordnet.synsets(word)
+    return list(set(chain.from_iterable([iter_word.lemma_names() for iter_word in sysnet_syns])).difference((word, word + 's', word + 'ing', word + 'es')))
 

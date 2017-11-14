@@ -1,9 +1,11 @@
 #!/usr/local/bin/python3
 from textutility import TextUtility
 from math import log
-
 from nltk.stem.porter import PorterStemmer
 from itertools import groupby
+from collections import defaultdict
+from wordprobability import WordProbability
+
 
 class LexicalDiversity(object):
   def __init__(self,text):
@@ -53,4 +55,17 @@ class LexicalDiversity(object):
       return (M1*M1)/(M2-M1)
     except ZeroDivisionError:
       return 0
+
+  def recommendSynonyms(self,significance,syllables):
+    #high syllable, high frequency words
+    word_probability = WordProbability(self.__text)
+    words = list(word_probability.probableWords(significance))
+    
+    synonyms = defaultdict(list)
+    for word in words:
+      if TextUtility.countSyllablesInWord(word) > syllables:
+        synonyms[word] = TextUtility.getSynonyms(word)
+
+    return synonyms
+      
 

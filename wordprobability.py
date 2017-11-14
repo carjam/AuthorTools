@@ -52,7 +52,7 @@ class WordProbability(object):
     word_probabilities = dict(sorted(word_probabilities.items(), key=lambda k: k[1], reverse=True))
     for word in word_probabilities:
       probability = word_probabilities[word]
-      if self.__is_number(probability) and not (probability > 0) :
+      if self.__is_number(probability) and probability > 0 :
         if (float(mean) + float(std_dev*significance)) >= float(probability):
           highinfo_words.append(word) 
 
@@ -72,7 +72,7 @@ class WordProbability(object):
     word_probabilities = dict(sorted(word_probabilities.items(), key=lambda k: k[1], reverse=True))
     for word in word_probabilities:
       probability = word_probabilities[word]
-      if self.__is_number(probability) and not (probability==0) :
+      if self.__is_number(probability) and probability > 0 :
         if (float(mean) + float(std_dev*significance)) < float(probability):
           lowinfo_words.append(word) 
 

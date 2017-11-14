@@ -62,5 +62,8 @@ def main():
   word_entropy = diversity.calcWordEntropy()
   sys.stdout.write('Word entropy: %f \n' % (word_entropy))
 
+  synonym_suggestions = diversity.recommendSynonyms(2.5,3)
+  sys.stdout.write('Here are some synonyms for frequently occuring words:\n %s \n' % (synonym_suggestions))
+
 #profile()
 main()
