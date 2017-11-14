@@ -1,8 +1,9 @@
 #!/usr/local/bin/python3
 import sys
 from textutility import TextUtility
-from textdescribe import TextDescribe
+from wordprobability import WordProbability
 from readability import Readability
+from lexicaldiversity import LexicalDiversity
 
 def profile():
   import cProfile
@@ -46,18 +47,19 @@ def main():
   sys.stdout.write('SMOG: years of education needed to comprehend: %f\n' % (SMOG))
 
   print("\n*** Description ***")
-  describe = TextDescribe(content)
-  hashtags = describe.hashtagSuggestions(2.5)
+  word_probability = WordProbability(content)
+  hashtags = word_probability.hashtagSuggestions(2.5)
   sys.stdout.write('Hashtag suggestions %s\n' % hashtags)
   
-  summary = describe.summary(2.5)
+  summary = word_probability.summary(2.5)
   sys.stdout.write('Summary %s\n' % summary)
 
   print("\n*** Lexical Diversity ***")
-  yulei = describe.yulei()
+  diversity = LexicalDiversity(content)
+  yulei = diversity.yulei()
   sys.stdout.write('Yule I Lexical Diversity: %f\n' % yulei)
 
-  word_entropy = describe.calcWordEntropy()
+  word_entropy = diversity.calcWordEntropy()
   sys.stdout.write('Word entropy: %f \n' % (word_entropy))
 
 #profile()

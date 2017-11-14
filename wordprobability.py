@@ -1,24 +1,15 @@
 #!/usr/local/bin/python3
 from textutility import TextUtility
 import re
-from math import log
-from math import e
 import numpy
 from memoized import memoized
 
-from nltk.stem.porter import PorterStemmer
-from itertools import groupby
 
-class TextDescribe(object):
+class WordProbability(object):
   def __init__(self,text):
     self.__text = text.lower().strip()
 
   
-  # Function to compute the base-2 logarithm of a floating point number.
-  def __log2(self,number):
-    return log(number) / log(2)
-
-
   def __is_number(self,s):
     try:
         float(s)
@@ -42,8 +33,8 @@ class TextDescribe(object):
 
     word_probabilities = {}
     for word in word_frequency.keys():
-      entropy_contribution = float(word_frequency[word]) / sum(word_frequency.values()) 
-      word_probabilities[word] = float(entropy_contribution) #final occurance of the word will offer best information
+      probability_contribution = float(word_frequency[word]) / sum(word_frequency.values()) 
+      word_probabilities[word] = float(probability_contribution) #final occurance of the word will offer best information
 
     return word_probabilities.items()
 
@@ -109,45 +100,3 @@ class TextDescribe(object):
     if len(result) == 0:
       result.append('None available')
     return result
-
-
-  '''Lexical Diversity Measures'''
-  def calcCharEntropy(self):
-    letter_frequency = TextUtility.countLetterFrequencies(self.__text)
-    length_sum = 0.0
-    for letter in letter_frequency:
-      probability = float(letter_frequency[letter]) / sum(letter_frequency.values())
-      length_sum -= probability * self.__log2(probability)
-    return length_sum
-
-
-  def calcWordEntropy(self):
-    word_frequency = TextUtility.countWordFrequencies(self.__text)
-    length_sum = 0.0
-    for word in word_frequency.keys():
-      probability = float(word_frequency[word]) / sum(word_frequency.values())
-      length_sum -= probability * self.__log2(probability)
-    return length_sum
-
-  
-  def yulei(self):
-    # yule's I measure (the inverse of yule's K measure)
-    # higher number is higher diversity - richer vocabulary
-    d = {}
-    stemmer = PorterStemmer()
-    words = TextUtility.tokenizeText(self.__text)
-    for w in words:
-      w = stemmer.stem(w).lower()
-      try:
-        d[w] += 1
-      except KeyError:
-        d[w] = 1
- 
-    M1 = float(len(d))
-    M2 = sum([len(list(g))*(freq**2) for freq,g in groupby(sorted(d.values()))])
-
-    try:
-      return (M1*M1)/(M2-M1)
-    except ZeroDivisionError:
-      return 0
-
