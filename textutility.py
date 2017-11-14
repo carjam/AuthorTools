@@ -76,18 +76,8 @@ class TextUtility:
 
   @classmethod 
   def getNSyllableWords(cls,data,numSyllables):
-    text = cls.tokenizeText(data)
-    words = [w.lower() for w in text]
-
     syllable_dictionary = cls.wordToSyllablesDict(data)
- 
-    word_count=0
-    for word in set(words):
-        if word in syllable_dictionary:
-          if syllable_dictionary[word] > numSyllables:
-            del syllable_dictionary[word]
-
-    return syllable_dictionary
+    return {(word):(syllable_dictionary[word]) for word in syllable_dictionary.keys() if syllable_dictionary[word] > numSyllables }
 
 
   @classmethod 
