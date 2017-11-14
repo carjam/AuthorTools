@@ -45,13 +45,7 @@ class TextUtility:
     exp = re.compile(regexp)
  
     syllable_dictionary={}
-    for word in words:
-      if exp.match(word):
-        if not (word in syllable_dictionary):
-          word_syllables = cls.countSyllablesInWord(word)
-          syllable_dictionary[word] = word_syllables
- 
-    return syllable_dictionary
+    return {(word):(cls.countSyllablesInWord(word)) for word in set(words) if exp.match(word) }
  
 
   @classmethod
@@ -88,7 +82,7 @@ class TextUtility:
     syllable_dictionary = cls.wordToSyllablesDict(data)
  
     word_count=0
-    for word in words:
+    for word in set(words):
         if word in syllable_dictionary:
           if syllable_dictionary[word] > numSyllables:
             del syllable_dictionary[word]
@@ -139,6 +133,7 @@ class TextUtility:
 
 
   @classmethod
+  @memoized
   def getSynonyms(cls,word):
     sysnet_syns = wordnet.synsets(word)
     return list(set(chain.from_iterable([iter_word.lemma_names() for iter_word in sysnet_syns])).difference((word, word + 's', word + 'ing', word + 'es')))
