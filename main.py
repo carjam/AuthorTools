@@ -14,17 +14,18 @@ def main():
   content = sys.stdin.read()
   
   cleanText = TextUtility.normalizeText(content.lower().strip())
-  characters = len(cleanText)
-  sentences = TextUtility.countSentences(content)
-  words = TextUtility.countWords(content)
-  complex_words = TextUtility.countNSyllableWords(content,3)
-  syllables = TextUtility.countSyllablesInText(content)
-  sys.stdout.write('Sentences: %i\n' % (sentences))
-  sys.stdout.write('Words: %i\n' % (words))
-  sys.stdout.write('Syllables: %i\n' % (syllables))
-  sys.stdout.write('Letters: %i\n' % (characters))
+  #characters = len(cleanText)
+  #sentences = TextUtility.countSentences(content)
+  #words = TextUtility.countWords(content)
+  #complex_words = TextUtility.countNSyllableWords(content,3)
+  #syllables = TextUtility.countSyllablesInText(content)
+  #sys.stdout.write('Sentences: %i\n' % (sentences))
+  #sys.stdout.write('Words: %i\n' % (words))
+  #sys.stdout.write('Syllables: %i\n' % (syllables))
+  #sys.stdout.write('Letters: %i\n' % (characters))
 
   #Readability measures
+  print("\n*** Readability ***")
   readability = Readability(content)
   Kincaid = readability.kincaid()
   sys.stdout.write('Kincaid (school grade level): %f\n' % (Kincaid))
@@ -44,25 +45,20 @@ def main():
   SMOG = readability.smog()
   sys.stdout.write('SMOG: years of education needed to comprehend: %f\n' % (SMOG))
 
-  #document description
+  print("\n*** Description ***")
   describe = TextDescribe(content)
-  char_entropy = describe.calcCharEntropy()
-  sys.stdout.write('Entropy: %f bits per character\n' % (char_entropy))
-
-  #diversity = describe.calcDiversityScore()
-  #sys.stdout.write('Word diversity: %f\n' % (diversity))
-
   hashtags = describe.hashtagSuggestions(2.5)
   sys.stdout.write('Hashtag suggestions %s\n' % hashtags)
   
-  probable_words = describe.probableWords(2.5)
-  #sys.stdout.write('\n\nProbable words %s\n' % probable_words)
-
   summary = describe.summary(2.5)
   sys.stdout.write('Summary %s\n' % summary)
 
+  print("\n*** Lexical Diversity ***")
   yulei = describe.yulei()
   sys.stdout.write('Yule I Lexical Diversity: %f\n' % yulei)
+
+  word_entropy = describe.calcWordEntropy()
+  sys.stdout.write('Word entropy: %f \n' % (word_entropy))
 
 #profile()
 main()

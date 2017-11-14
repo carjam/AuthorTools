@@ -27,24 +27,7 @@ class TextDescribe(object):
         return False
 
 
-  def calcCharEntropy(self):
-    letter_frequency = TextUtility.countLetterFrequencies(self.__text)
-    length_sum = 0.0
-    for letter in letter_frequency:
-      probability = float(letter_frequency[letter]) / sum(letter_frequency.values())
-      length_sum -= probability * self.__log2(probability)
-    return length_sum
-
-
-  def calcWordEntropy(self):
-    word_frequency = TextUtility.countWordFrequencies(self.__text)
-    length_sum = 0.0
-    for word in word_frequency.keys():
-      probability = float(word_frequency[word]) / sum(word_frequency.values())
-      length_sum -= probability * self.__log2(probability)
-    return length_sum
-
-
+  '''Word Probability'''
   @memoized
   def __calculateWordProbabilities(self):
     word_frequency = TextUtility.countWordFrequencies(self.__text) #language depedent
@@ -126,7 +109,26 @@ class TextDescribe(object):
     if len(result) == 0:
       result.append('None available')
     return result
-  
+
+
+  '''Lexical Diversity Measures'''
+  def calcCharEntropy(self):
+    letter_frequency = TextUtility.countLetterFrequencies(self.__text)
+    length_sum = 0.0
+    for letter in letter_frequency:
+      probability = float(letter_frequency[letter]) / sum(letter_frequency.values())
+      length_sum -= probability * self.__log2(probability)
+    return length_sum
+
+
+  def calcWordEntropy(self):
+    word_frequency = TextUtility.countWordFrequencies(self.__text)
+    length_sum = 0.0
+    for word in word_frequency.keys():
+      probability = float(word_frequency[word]) / sum(word_frequency.values())
+      length_sum -= probability * self.__log2(probability)
+    return length_sum
+
   
   def yulei(self):
     # yule's I measure (the inverse of yule's K measure)
@@ -148,3 +150,4 @@ class TextDescribe(object):
       return (M1*M1)/(M2-M1)
     except ZeroDivisionError:
       return 0
+
