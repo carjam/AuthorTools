@@ -4,6 +4,7 @@ import re
 from math import log
 from math import e
 import numpy
+from memoized import memoized
 
 class TextDescribe(object):
   def __init__(self,text):
@@ -41,14 +42,7 @@ class TextDescribe(object):
     return length_sum
 
 
-  #def calcDiversityScore(self): #Shannon equitability index
-  #    word_frequency = TextUtility.countWordFrequencies(self.__text)
-  #    k = len(word_frequency.keys())
-  #    n = sum(word_frequency.values())
-  #    #return(((n * log(n) - self.calcWordEntropy())/n)/log(k)
-  #    return self.calcWordEntropy()/log(k)
-
-
+  @memoized
   def __calculateWordProbabilities(self):
     word_frequency = TextUtility.countWordFrequencies(self.__text) #language depedent
 
@@ -65,12 +59,12 @@ class TextDescribe(object):
       entropy_contribution = float(word_frequency[word]) / sum(word_frequency.values()) 
       word_probabilities[word] = float(entropy_contribution) #final occurance of the word will offer best information
 
-    return word_probabilities
+    return word_probabilities.items()
 
 
   #extract words with high information
   def probableWords(self,significance):
-    word_probabilities = self.__calculateWordProbabilities()
+    word_probabilities = dict(self.__calculateWordProbabilities())
 
     #get stats on entropies
     probabilities = list(word_probabilities.values())
@@ -90,7 +84,7 @@ class TextDescribe(object):
 
   #extract words with low information
   def unlikelyWords(self,significance):
-    word_probabilities = self.__calculateWordProbabilities()
+    word_probabilities = dict(self.__calculateWordProbabilities())
 
     #get stats on probabilities
     probabilities = list(word_probabilities.values())
