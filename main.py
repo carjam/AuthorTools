@@ -59,7 +59,10 @@ def main():
   #sys.stdout.write('\n\nProbable words %s\n' % probable_words)
 
   summary = describe.summary(2.5)
-  sys.stdout.write('\n\nSummary %s\n' % summary)
+  sys.stdout.write('Summary %s\n' % summary)
+
+  yulei = describe.yulei()
+  sys.stdout.write('Yule I Lexical Diversity: %f\n' % yulei)
 
 #profile()
 main()
