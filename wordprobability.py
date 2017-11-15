@@ -7,7 +7,7 @@ from memoized import memoized
 
 class WordProbability(object):
   def __init__(self,text):
-    self.__text = text.lower().strip()
+    self.__tu = TextUtility(text)
 
   
   def __is_number(self,s):
@@ -21,8 +21,8 @@ class WordProbability(object):
   '''Word Probability'''
   @memoized
   def __calculateWordProbabilities(self):
-    word_frequency = TextUtility.countWordFrequencies(self.__text) #language depedent
-    word_count = TextUtility.countWords(self.__text)
+    word_frequency = self.__tu.countWordFrequencies()
+    word_count = self.__tu.countWords()
 
     MIN_CHARS = 5
     regexp = "[A-Za-z]+"
@@ -85,7 +85,7 @@ class WordProbability(object):
 
 
   def summary(self,percentile):
-    sentences = TextUtility.sentenceTokenizeText(self.__text)
+    sentences = self.__tu.sentenceTokenizeText()
     words = self.wordsBelowPercentile(percentile)
     print(words)
 

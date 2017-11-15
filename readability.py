@@ -2,16 +2,16 @@
 from textutility import TextUtility
 
 class Readability:
-  COMPLEX_WORD_SYLLABLES = 3
+  __COMPLEX_WORD_SYLLABLES = 3
 
   def __init__(self,text):
-    self.__text = text.lower().strip()
-    self.__sentences = TextUtility.countSentences(self.__text)
-    self.__words = TextUtility.countWords(self.__text)
-    cleanText = TextUtility.normalizeText(self.__text)
+    tu = TextUtility(text)
+    self.__sentences = tu.countSentences()
+    self.__words = tu.countWords()
+    cleanText = tu.normalizeText()
     self.__characters = len(cleanText)
-    self.__syllables = TextUtility.countSyllablesInText(self.__text)
-    self.__complex_words = TextUtility.countNSyllableWords(self.__text,self.COMPLEX_WORD_SYLLABLES)
+    self.__syllables = tu.countSyllablesInText()
+    self.__complex_words = tu.countNSyllableWords(self.__COMPLEX_WORD_SYLLABLES)
 
 
   def kincaid(self):

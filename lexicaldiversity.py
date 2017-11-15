@@ -9,7 +9,8 @@ from wordprobability import WordProbability
 
 class LexicalDiversity(object):
   def __init__(self,text):
-    self.__text = text.lower().strip()
+    self.__text = text
+    self.__tu = TextUtility(self.__text)
 
   
   # Function to compute the base-2 logarithm of a floating point number.
@@ -18,7 +19,7 @@ class LexicalDiversity(object):
 
 
   def calcCharEntropy(self):
-    letter_frequency = TextUtility.countLetterFrequencies(self.__text)
+    letter_frequency = self.__tu.countLetterFrequencies()
     length_sum = 0.0
     for letter in letter_frequency:
       probability = float(letter_frequency[letter]) / sum(letter_frequency.values())
@@ -27,7 +28,7 @@ class LexicalDiversity(object):
 
 
   def calcWordEntropy(self):
-    word_frequency = TextUtility.countWordFrequencies(self.__text)
+    word_frequency = self.__tu.countWordFrequencies()
     length_sum = 0.0
     for word in word_frequency.keys():
       probability = float(word_frequency[word]) / sum(word_frequency.values())
@@ -40,7 +41,7 @@ class LexicalDiversity(object):
     # higher number is higher diversity - richer vocabulary
     d = {}
     stemmer = PorterStemmer()
-    words = TextUtility.tokenizeText(self.__text)
+    words = self.__tu.tokenizeText()
     for w in words:
       w = stemmer.stem(w).lower()
       try:
@@ -60,7 +61,7 @@ class LexicalDiversity(object):
     #high syllable, high frequency words
     word_probability = WordProbability(self.__text)
     words = list(word_probability.wordsAbovePercentile(percentile))
-    
+   
     synonyms = defaultdict(list)
     for word in words:
       if TextUtility.countSyllablesInWord(word) > syllables:
