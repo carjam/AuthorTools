@@ -3,10 +3,13 @@ import re
 import nltk #http://www.nltk.org/
 nltk.download('cmudict')
 nltk.download('punkt')
-from curses.ascii import isdigit
+nltk.download('wordnet')
 from nltk.corpus import cmudict
 import nltk.data
+from nltk.corpus import wordnet
+from curses.ascii import isdigit
 from memoized import memoized
+from itertools import chain
 
 class TextUtility:
 
@@ -42,13 +45,7 @@ class TextUtility:
     exp = re.compile(regexp)
  
     syllable_dictionary={}
-    for word in words:
-      if exp.match(word):
-        if not (word in syllable_dictionary):
-          word_syllables = cls.countSyllablesInWord(word)
-          syllable_dictionary[word] = word_syllables
- 
-    return syllable_dictionary
+    return {(word):(cls.countSyllablesInWord(word)) for word in set(words) if exp.match(word) }
  
 
   @classmethod
@@ -79,18 +76,8 @@ class TextUtility:
 
   @classmethod 
   def getNSyllableWords(cls,data,numSyllables):
-    text = cls.tokenizeText(data)
-    words = [w.lower() for w in text]
-
     syllable_dictionary = cls.wordToSyllablesDict(data)
- 
-    word_count=0
-    for word in words:
-        if word in syllable_dictionary:
-          if syllable_dictionary[word] > numSyllables:
-            del syllable_dictionary[word]
-
-    return syllable_dictionary
+    return {(word):(syllable_dictionary[word]) for word in syllable_dictionary.keys() if syllable_dictionary[word] > numSyllables }
 
 
   @classmethod 
@@ -133,4 +120,11 @@ class TextUtility:
     sentence_count = 0
     sentences = nltk.sent_tokenize(data)
     return len(sentences) - 1
+
+
+  @classmethod
+  @memoized
+  def getSynonyms(cls,word):
+    sysnet_syns = wordnet.synsets(word)
+    return list(set(chain.from_iterable([iter_word.lemma_names() for iter_word in sysnet_syns])).difference((word, word + 's', word + 'ing', word + 'es')))
 

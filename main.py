@@ -1,8 +1,9 @@
 #!/usr/local/bin/python3
 import sys
 from textutility import TextUtility
-from textdescribe import TextDescribe
+from wordprobability import WordProbability
 from readability import Readability
+from lexicaldiversity import LexicalDiversity
 
 def profile():
   import cProfile
@@ -14,17 +15,18 @@ def main():
   content = sys.stdin.read()
   
   cleanText = TextUtility.normalizeText(content.lower().strip())
-  characters = len(cleanText)
-  sentences = TextUtility.countSentences(content)
-  words = TextUtility.countWords(content)
-  complex_words = TextUtility.countNSyllableWords(content,3)
-  syllables = TextUtility.countSyllablesInText(content)
-  sys.stdout.write('Sentences: %i\n' % (sentences))
-  sys.stdout.write('Words: %i\n' % (words))
-  sys.stdout.write('Syllables: %i\n' % (syllables))
-  sys.stdout.write('Letters: %i\n' % (characters))
+  #characters = len(cleanText)
+  #sentences = TextUtility.countSentences(content)
+  #words = TextUtility.countWords(content)
+  #complex_words = TextUtility.countNSyllableWords(content,3)
+  #syllables = TextUtility.countSyllablesInText(content)
+  #sys.stdout.write('Sentences: %i\n' % (sentences))
+  #sys.stdout.write('Words: %i\n' % (words))
+  #sys.stdout.write('Syllables: %i\n' % (syllables))
+  #sys.stdout.write('Letters: %i\n' % (characters))
 
   #Readability measures
+  print("\n*** Readability ***")
   readability = Readability(content)
   Kincaid = readability.kincaid()
   sys.stdout.write('Kincaid (school grade level): %f\n' % (Kincaid))
@@ -44,22 +46,26 @@ def main():
   SMOG = readability.smog()
   sys.stdout.write('SMOG: years of education needed to comprehend: %f\n' % (SMOG))
 
-  #document description
-  describe = TextDescribe(content)
-  char_entropy = describe.calcCharEntropy()
-  sys.stdout.write('Entropy: %f bits per character\n' % (char_entropy))
-
-  #diversity = describe.calcDiversityScore()
-  #sys.stdout.write('Word diversity: %f\n' % (diversity))
-
-  hashtags = describe.hashtagSuggestions(2.5)
+  print("\n*** Description ***")
+  word_probability = WordProbability(content)
+  hashtags = word_probability.hashtagSuggestions(99)
   sys.stdout.write('Hashtag suggestions %s\n' % hashtags)
   
-  probable_words = describe.probableWords(2.5)
-  #sys.stdout.write('\n\nProbable words %s\n' % probable_words)
+  summary = word_probability.summary(95)
+  sys.stdout.write('Summary %s\n' % summary)
 
-  summary = describe.summary(2.5)
-  sys.stdout.write('\n\nSummary %s\n' % summary)
+  print("\n*** Lexical Diversity ***")
+  diversity = LexicalDiversity(content)
+  yulei = diversity.yulei()
+  sys.stdout.write('Yule I Lexical Diversity: %f\n' % yulei)
+
+  word_entropy = diversity.calcWordEntropy()
+  sys.stdout.write('Word entropy: %f \n' % (word_entropy))
+
+  synonym_suggestions = diversity.recommendSynonyms(95,3)
+  sys.stdout.write('\nHere are some synonyms for frequently occuring words:\n')
+  for word in synonym_suggestions.keys():
+    print(word,synonym_suggestions[word])
 
 #profile()
 main()
