@@ -13,17 +13,8 @@ def profile():
 def main():
   # Read and normalise input text
   content = sys.stdin.read()
-  
-  cleanText = TextUtility.normalizeText(content.lower().strip())
-  #characters = len(cleanText)
-  #sentences = TextUtility.countSentences(content)
-  #words = TextUtility.countWords(content)
-  #complex_words = TextUtility.countNSyllableWords(content,3)
-  #syllables = TextUtility.countSyllablesInText(content)
-  #sys.stdout.write('Sentences: %i\n' % (sentences))
-  #sys.stdout.write('Words: %i\n' % (words))
-  #sys.stdout.write('Syllables: %i\n' % (syllables))
-  #sys.stdout.write('Letters: %i\n' % (characters))
+  tu = TextUtility(content)
+  cleanText = tu.normalizeText()
 
   #Readability measures
   print("\n*** Readability ***")
@@ -51,8 +42,8 @@ def main():
   hashtags = word_probability.hashtagSuggestions(99)
   sys.stdout.write('Hashtag suggestions %s\n' % hashtags)
   
-  summary = word_probability.summary(95)
-  sys.stdout.write('Summary %s\n' % summary)
+  summary = word_probability.summary(55)
+  sys.stdout.write('\nSummary %s\n' % summary)
 
   print("\n*** Lexical Diversity ***")
   diversity = LexicalDiversity(content)

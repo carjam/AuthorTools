@@ -13,39 +13,39 @@ from itertools import chain
 
 class TextUtility:
 
+  def __init__(self,text):
+    self.__text = text.lower().strip()    
+
+
   @classmethod
   @memoized
   def __getCMUDict(cls,*args):
     return cmudict.dict()
 
 
-  @classmethod
-  def normalizeText(cls,data):
+  def normalizeText(self):
     cleaner = re.compile('[^a-z]+')
-    return cleaner.sub(' ',data)
+    return cleaner.sub(' ',self.__text)
  
-
-  @classmethod
-  def tokenizeText(cls,data):
+  @memoized
+  def tokenizeText(self):
     tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
-    tokens = nltk.wordpunct_tokenize(data)
+    tokens = nltk.wordpunct_tokenize(self.__text)
     return nltk.Text(tokens)
 
+  @memoized
+  def sentenceTokenizeText(self):
+    return nltk.sent_tokenize(self.__text)
 
-  @classmethod
-  def sentenceTokenizeText(cls,data):
-    return nltk.sent_tokenize(data)
 
-
-  @classmethod 
-  def wordToSyllablesDict(cls,data):
-    text = cls.tokenizeText(data)
+  def wordToSyllablesDict(self):
+    text = self.tokenizeText()
     words = [w.lower() for w in text]
     regexp = "[A-Za-z]+"
     exp = re.compile(regexp)
  
     syllable_dictionary={}
-    return {(word):(cls.countSyllablesInWord(word)) for word in set(words) if exp.match(word) }
+    return {(word):(TextUtility.countSyllablesInWord(word)) for word in set(words) if exp.match(word) }
  
 
   @classmethod
@@ -59,12 +59,11 @@ class TextUtility:
       return max([len([y for y in x if isdigit(y[-1])]) for x in cmud[lowercase]])
 
 
-  @classmethod 
-  def countSyllablesInText(cls,data):
-    text = cls.tokenizeText(data)
+  def countSyllablesInText(self):
+    text = self.tokenizeText()
     words = [w.lower() for w in text]
 
-    syllable_dictionary = cls.wordToSyllablesDict(data)
+    syllable_dictionary = self.wordToSyllablesDict()
 
     syllable_count = 0
     for word in words:
@@ -74,21 +73,18 @@ class TextUtility:
     return syllable_count
 
 
-  @classmethod 
-  def getNSyllableWords(cls,data,numSyllables):
-    syllable_dictionary = cls.wordToSyllablesDict(data)
+  def getNSyllableWords(self,numSyllables):
+    syllable_dictionary = self.wordToSyllablesDict()
     return {(word):(syllable_dictionary[word]) for word in syllable_dictionary.keys() if syllable_dictionary[word] > numSyllables }
 
 
-  @classmethod 
-  def countNSyllableWords(cls,data,numSyllables):
-    return len(cls.getNSyllableWords(data,numSyllables).keys())
+  def countNSyllableWords(self,numSyllables):
+    return len(self.getNSyllableWords(numSyllables).keys())
 
 
-  @classmethod  
-  def countLetterFrequencies(cls,data):
+  def countLetterFrequencies(self):
     letter_frequency = {}
-    for letter in data:
+    for letter in self.__text:
         if letter in letter_frequency:
             letter_frequency[letter] += 1
         else:
@@ -96,10 +92,9 @@ class TextUtility:
     return letter_frequency
 
 
-  @classmethod
-  def countWordFrequencies(cls,data):
+  def countWordFrequencies(self):
     word_frequency = {}
-    words = nltk.word_tokenize(data)
+    words = self.tokenizeText()
     for word in words:
         if word in word_frequency:
             word_frequency[word] += 1
@@ -108,18 +103,16 @@ class TextUtility:
     return word_frequency
  
  
-  @classmethod
-  def countWords(cls,data):
+  def countWords(self):
     word_count = 0
-    words = nltk.word_tokenize(data)
-    return len(words) - 1
+    words = self.tokenizeText()
+    return len(words)
 
 
-  @classmethod
-  def countSentences(cls,data):
+  def countSentences(self):
     sentence_count = 0
-    sentences = nltk.sent_tokenize(data)
-    return len(sentences) - 1
+    sentences = self.sentenceTokenizeText()
+    return len(sentences)
 
 
   @classmethod
