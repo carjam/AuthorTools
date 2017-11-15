@@ -51,8 +51,8 @@ def main():
   hashtags = word_probability.hashtagSuggestions(99)
   sys.stdout.write('Hashtag suggestions %s\n' % hashtags)
   
-  summary = word_probability.summary(95)
-  sys.stdout.write('Summary %s\n' % summary)
+  summary = word_probability.summary(55)
+  sys.stdout.write('\nSummary %s\n' % summary)
 
   print("\n*** Lexical Diversity ***")
   diversity = LexicalDiversity(content)

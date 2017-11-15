@@ -59,7 +59,7 @@ class LexicalDiversity(object):
   def recommendSynonyms(self,percentile,syllables):
     #high syllable, high frequency words
     word_probability = WordProbability(self.__text)
-    words = list(word_probability.probableWords(percentile))
+    words = list(word_probability.wordsAbovePercentile(percentile))
     
     synonyms = defaultdict(list)
     for word in words:

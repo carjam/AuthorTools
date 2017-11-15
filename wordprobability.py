@@ -40,7 +40,7 @@ class WordProbability(object):
 
 
   #extract words with high information
-  def probableWords(self,percentile):
+  def wordsAbovePercentile(self,percentile):
     word_probabilities = dict(self.__calculateWordProbabilities())
 
     probabilities = list(word_probabilities.values())
@@ -58,7 +58,7 @@ class WordProbability(object):
 
 
   #extract words with low information
-  def unlikelyWords(self,percentile):
+  def wordsBelowPercentile(self,percentile):
     word_probabilities = dict(self.__calculateWordProbabilities())
 
     probabilities = list(word_probabilities.values())
@@ -76,21 +76,26 @@ class WordProbability(object):
 
  
   def hashtagSuggestions(self,percentile):
-    hashtags = list(self.probableWords(percentile))
+    wordsA = list(self.wordsAbovePercentile(percentile))
+    wordsB = list(self.wordsBelowPercentile(100-percentile))
+    hashtags = wordsA + wordsB
+
     hashtags[:] = ['#' + word for word in hashtags]
     return hashtags
 
 
   def summary(self,percentile):
     sentences = TextUtility.sentenceTokenizeText(self.__text)
-    words = self.probableWords(percentile)
+    words = self.wordsBelowPercentile(percentile)
+    print(words)
+
     result=[]
     for sentence in sentences:
       word_match = 0
       for word in words:
         if word in sentence:
           word_match += 1
-          if word_match > 2 and len(sentence) < 150 and sentence not in result:
+          if word_match > 1 and len(sentence) < 150 and sentence not in result:
             result.append(sentence)
     
     if len(result) == 0:
