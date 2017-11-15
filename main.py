@@ -51,7 +51,7 @@ def main():
   hashtags = word_probability.hashtagSuggestions(99)
   sys.stdout.write('Hashtag suggestions %s\n' % hashtags)
   
-  summary = word_probability.summary(99)
+  summary = word_probability.summary(95)
   sys.stdout.write('Summary %s\n' % summary)
 
   print("\n*** Lexical Diversity ***")
@@ -62,7 +62,7 @@ def main():
   word_entropy = diversity.calcWordEntropy()
   sys.stdout.write('Word entropy: %f \n' % (word_entropy))
 
-  synonym_suggestions = diversity.recommendSynonyms(99.9999,3)
+  synonym_suggestions = diversity.recommendSynonyms(95,3)
   sys.stdout.write('\nHere are some synonyms for frequently occuring words:\n')
   for word in synonym_suggestions.keys():
     print(word,synonym_suggestions[word])

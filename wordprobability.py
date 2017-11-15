@@ -51,7 +51,7 @@ class WordProbability(object):
     for word in word_probabilities:
       probability = word_probabilities[word]
       if self.__is_number(probability) and probability > 0 :
-        if percentile_score >= float(probability):
+        if percentile_score <= float(probability):
           highinfo_words.append(word) 
 
     return set(highinfo_words)
@@ -69,21 +69,21 @@ class WordProbability(object):
     for word in word_probabilities:
       probability = word_probabilities[word]
       if self.__is_number(probability) and probability > 0 :
-        if percentile_score < float(probability):
+        if percentile_score > float(probability):
           lowinfo_words.append(word) 
 
     return set(lowinfo_words)
 
  
   def hashtagSuggestions(self,percentile):
-    hashtags = list(self.unlikelyWords(percentile))
+    hashtags = list(self.probableWords(percentile))
     hashtags[:] = ['#' + word for word in hashtags]
     return hashtags
 
 
   def summary(self,percentile):
     sentences = TextUtility.sentenceTokenizeText(self.__text)
-    words = self.unlikelyWords(percentile)
+    words = self.probableWords(percentile)
     result=[]
     for sentence in sentences:
       word_match = 0
