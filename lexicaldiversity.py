@@ -56,15 +56,17 @@ class LexicalDiversity(object):
     except ZeroDivisionError:
       return 0
 
-  def recommendSynonyms(self,significance,syllables):
+  def recommendSynonyms(self,percentile,syllables):
     #high syllable, high frequency words
     word_probability = WordProbability(self.__text)
-    words = list(word_probability.probableWords(significance))
+    words = list(word_probability.probableWords(percentile))
     
     synonyms = defaultdict(list)
     for word in words:
       if TextUtility.countSyllablesInWord(word) > syllables:
-        synonyms[word] = TextUtility.getSynonyms(word)
+        syn_list = TextUtility.getSynonyms(word)
+        if len(syn_list) > 0:
+          synonyms[word] = syn_list
 
     return synonyms
       
