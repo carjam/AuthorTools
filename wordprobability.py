@@ -87,7 +87,6 @@ class WordProbability(object):
   def summary(self,percentile):
     sentences = self.__tu.sentenceTokenizeText()
     words = self.wordsBelowPercentile(percentile)
-    print(words)
 
     result=[]
     for sentence in sentences:
