@@ -4,6 +4,7 @@ from textutility import TextUtility
 from wordprobability import WordProbability
 from readability import Readability
 from lexicaldiversity import LexicalDiversity
+from plagarism import Plagarism
 
 def profile():
   import cProfile
@@ -37,14 +38,6 @@ def main():
   SMOG = readability.smog()
   sys.stdout.write('SMOG: years of education needed to comprehend: %f\n' % (SMOG))
 
-  print("\n*** Description ***")
-  word_probability = WordProbability(content)
-  hashtags = word_probability.hashtagSuggestions(99)
-  sys.stdout.write('Hashtag suggestions %s\n' % hashtags)
-  
-  summary = word_probability.summary(55)
-  sys.stdout.write('\nSummary %s\n' % summary)
-
   print("\n*** Lexical Diversity ***")
   diversity = LexicalDiversity(content)
   yulei = diversity.yulei()
@@ -58,5 +51,20 @@ def main():
   for word in synonym_suggestions.keys():
     print(word,synonym_suggestions[word])
 
+
+  print("\n*** Description ***")
+  word_probability = WordProbability(content)
+  hashtags = word_probability.hashtagSuggestions(99)
+  sys.stdout.write('Hashtag suggestions %s\n' % hashtags)
+  
+  summary = word_probability.summary(55)
+  sys.stdout.write('\nSummary %s\n' % summary)
+
+  print("\n*** Plagarism ***")
+  plagarism = Plagarism()
+  txt = content #"THESE GEEKS FOR GEEKS"
+  pat = "empowers consumers to take control" #"GEEK"
+  plg = plagarism.rabinKarp(pat,txt)
+  sys.stdout.write('Rabin-Karp found pattern at %s \n' % str(plg))
 #profile()
 main()
