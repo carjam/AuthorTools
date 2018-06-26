@@ -61,7 +61,7 @@ class LexicalDiversity(object):
     #high syllable, high frequency words
     word_probability = WordProbability(self.__text)
     words = list(word_probability.wordsAbovePercentile(percentile))
-   
+ 
     synonyms = defaultdict(list)
     for word in words:
       if TextUtility.countSyllablesInWord(word) > syllables:
@@ -70,5 +70,5 @@ class LexicalDiversity(object):
           synonyms[word] = syn_list
 
     return synonyms
-      
+
 
