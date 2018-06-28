@@ -60,23 +60,38 @@ class Plagarism:
 
 
   #wildcard pattern search based on rabin-karp
+  #needs refactoring for optimaization
   def wildCardSearch(self, pattern, txt):
     wildcard = '*'
     patterns = pattern.split(wildcard)
 
+    if len(patterns) < 2:
+        raise ValueError('Wildcard search requires a wildcard')
+
     i = 0
     prunedPatterns = set()
     minLen = min([len(pat) for pat in patterns])
-    for pat in iter(patterns):
+    for pat in patterns:
         prunedPat = pat[-minLen:] if i%2==0 else pat[:minLen]
         prunedPatterns.add(prunedPat)
         i+=1
 
-    if len(patterns) < 2:
-        raise ValueError('Wildcard search requires a wildcard')
-
     wild = self.rabinKarp(prunedPatterns, txt)
 
-    #cartesian product
-    #loop left right, next left right, etc to find all contiguous matches
-    return wild
+    #loop over patterns in order to find contiguous matches
+    i=0
+    contiguous = dict()
+    for pat in patterns:
+        prunedPat = pat[-minLen:] if i%2==0 else pat[:minLen]
+        contiguous[prunedPat] = []
+        i+=1
+
+    i=0
+    firstHit=0
+    for pat in patterns:
+        prunedPat = pat[-minLen:] if i%2==0 else pat[:minLen]
+        firstHit = min(v for v in wild[prunedPat] if v > firstHit)
+        contiguous[prunedPat].append(firstHit)
+        i+=1
+
+    return contiguous
