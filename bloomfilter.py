@@ -2,7 +2,6 @@ import math
 from bitarray import bitarray
 from decimal import Decimal
 
-# doesn't work for size 1
 class BloomFilter(object):
         def getTrueBits(self):
             return self.trueBits
@@ -57,12 +56,14 @@ class BloomFilter(object):
             self.bits.setall(0)
 
             self.hashFunctionCount = hashFunctionCount
-            self.secondaryHashFunction = self.recommendedUInt32HashFunction #hashFunction
+            self.secondaryHashFunction = self.intHashFunction #hashFunction
 
             self.addRange(items)
 
         @classmethod
         def getOptimalError(cls, capacity):
+            if capacity == 1:
+                return Decimal(0.5)
             # Starobinski, David; Trachtenberg, Ari; Agarwal, Sachin (2003), "Efficient PDA Synchronization", IEEE Transactions on Mobile Computing 2 (1): 40, doi:10.1109/TMC.2003.1195150
             return Decimal(1.0) / Decimal(capacity)
 
@@ -90,7 +91,7 @@ class BloomFilter(object):
             return math.pow(1.0 - math.pow(1.0 - 1.0 / Decimal(self.arraySize), Decimal(self.hashFunctionCount) * Decimal(self.count)), Decimal(self.hashFunctionCount))
 
         @classmethod
-        def recommendedUInt32HashFunction(cls, x):
+        def intHashFunction(cls, x):
             # Integer hash function from http:#www.concentric.net/~Ttwang/tech/inthash.htm
             x = int(x)
             x = ~x + (x << 15) # x = (x << 15) - x- 1, as (~x) + y is equivalent to y - x - 1 in two's complement representation
