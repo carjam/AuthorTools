@@ -62,9 +62,15 @@ def main():
 
   print("\n*** Plagarism ***")
   plagarism = Plagarism()
-  txt = content #"THESE GEEKS FOR GEEKS"
-  pat = "empowers consumers to take control" #"GEEK"
-  plg = plagarism.rabinKarp(pat,txt)
+  #txt = content 
+  txt = "THESE GEEKS FOR GEEKS"
+  #pat = "empowers consumers to take control" #"GEEK"
+  pat = "GEEK"
+  setPat = {"GEEK"}
+  plg = plagarism.rabinKarp(setPat,txt, 0.05)
   sys.stdout.write('Rabin-Karp found pattern at %s \n' % str(plg))
+  plg2 = plagarism.rabinKarpSingle(pat,txt)
+  sys.stdout.write('Rabin-Karp single found pattern at %s \n' % str(plg2))
+
 #profile()
 main()
