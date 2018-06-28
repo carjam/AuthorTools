@@ -61,6 +61,7 @@ class Plagarism:
 
   #wildcard pattern search based on rabin-karp
   #needs refactoring for optimaization
+  #refactor to match from wildcard back outward to make sure pruned pattern fully matches requested pattern
   def wildCardSearch(self, pattern, txt):
     wildcard = '*'
     patterns = pattern.split(wildcard)
