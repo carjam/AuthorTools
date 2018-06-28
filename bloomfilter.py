@@ -1,7 +1,9 @@
+#!/usr/local/bin/python3
 import math
 from bitarray import bitarray
 from decimal import Decimal
 
+#adapted from https://github.com/petrmanek/rabin-karp-searcher
 class BloomFilter(object):
         def getTrueBits(self):
             return self.trueBits
@@ -139,7 +141,7 @@ class BloomFilter(object):
 
                 if (not self.bits[compoundHash]):
                     return False
-            
+
             return True;
 
         # <summary>

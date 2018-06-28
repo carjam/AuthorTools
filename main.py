@@ -66,8 +66,11 @@ def main():
   pat = "empowers consumers to take control"
   setPat = { "empowers consumers", "a million bank acc", "Contact UsPrivacy " }
 
-  plg = plagarism.rabinKarp(setPat,txt, 0.05)
+  plg = plagarism.rabinKarp(setPat,txt)
   sys.stdout.write('Rabin-Karp found pattern at %s \n' % str(plg))
+
+  wild = plagarism.wildCardSearch('empowers c*to take*of their financial', txt)
+  sys.stdout.write('Wildcard search found %s \n' % str(wild))
 
 #profile()
 main()

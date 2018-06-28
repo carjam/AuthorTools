@@ -2,7 +2,7 @@
 from bloomfilter import BloomFilter
 
 class Plagarism:
-  def rabinKarp(self, patterns, txt, acceptableRateFalsePos):
+  def rabinKarp(self, patterns, txt):
     if (not txt or not patterns):
         raise ValueError('Search requires text and a pattern')
 
@@ -58,3 +58,25 @@ class Plagarism:
 
     return matches
 
+
+  #wildcard pattern search based on rabin-karp
+  def wildCardSearch(self, pattern, txt):
+    wildcard = '*'
+    patterns = pattern.split(wildcard)
+
+    i = 0
+    prunedPatterns = set()
+    minLen = min([len(pat) for pat in patterns])
+    for pat in iter(patterns):
+        prunedPat = pat[-minLen:] if i%2==0 else pat[:minLen]
+        prunedPatterns.add(prunedPat)
+        i+=1
+
+    if len(patterns) < 2:
+        raise ValueError('Wildcard search requires a wildcard')
+
+    wild = self.rabinKarp(prunedPatterns, txt)
+
+    #cartesian product
+    #loop left right, next left right, etc to find all contiguous matches
+    return wild
