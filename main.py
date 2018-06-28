@@ -66,7 +66,7 @@ def main():
   txt = "THESE GEEKS FOR GEEKS"
   #pat = "empowers consumers to take control" #"GEEK"
   pat = "GEEK"
-  setPat = {"GEEK"}
+  setPat = {"GEEK", "THES"}
   plg = plagarism.rabinKarp(setPat,txt, 0.05)
   sys.stdout.write('Rabin-Karp found pattern at %s \n' % str(plg))
   plg2 = plagarism.rabinKarpSingle(pat,txt)

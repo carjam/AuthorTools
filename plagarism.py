@@ -40,8 +40,6 @@ class Plagarism:
         for i in range(patternLen):
             patternHash = (d*patternHash + ord(pat[i]))%q
         patternHashes.append(patternHash)
-        #print("pattern ", pat)
-        #print("patternHash ",  patternHashes)
     bloomf = BloomFilter(patternHashes)
 
     # setup the first comparison based on length of pattern
@@ -53,8 +51,6 @@ class Plagarism:
 
     #scoot through txt 1 char at a time
     while (right <= txtLen):
-        #print("text", txt[left:right])
-        #print("txtHash ", txtHash)
         if (bloomf.contains(txtHash)):
             if (txt[left:right] in patterns):
                 matches.append(left)
@@ -103,7 +99,6 @@ class Plagarism:
         j+=1
         # if p == t and pat[0...M-1] = txt[i, i+1, ...i+M-1]
         if j==patternLen:
-          #print 'Pattern found at index ' + str(i)
           matches.append(i)
 
       # Calculate hash value for next window of text: Remove

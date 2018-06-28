@@ -2,9 +2,10 @@ import math
 from bitarray import bitarray
 from decimal import Decimal
 
+# doesn't work for size 1
 class BloomFilter(object):
         def getTrueBits(self):
-            return self.trueBits;
+            return self.trueBits
 
         def setTrueBits(self, trueBits):
             self.trueBits = trueBits
@@ -28,7 +29,7 @@ class BloomFilter(object):
             self.arraySize = arraySize
 
         def getHashFunctionCount(self):
-            return self.hashFunctionCount;
+            return self.hashFunctionCount
 
         def setHashFunctionCount(self, count):
             self.hashFunctionCount = count
@@ -45,7 +46,7 @@ class BloomFilter(object):
         def __init__(self, items):
             self.count = 0
             self.trueBits = 0
- 
+
             capacity = len(items)
             error = self.getOptimalError(capacity)
             arraySize = self.getOptimalArraySize(capacity, error)
@@ -77,7 +78,7 @@ class BloomFilter(object):
 
         def computeDoubleHash(self, primary, secondary, offset):
             # Dillinger-Manolios Formula
-            compoundHash = (primary + offset * secondary) % ArraySize
+            compoundHash = (primary + offset * secondary) % self.arraySize
             return int( math.fabs(compoundHash) )
 
         # <summary>
@@ -110,12 +111,12 @@ class BloomFilter(object):
             secondary = self.secondaryHashFunction(item)
 
             for i in range(self.hashFunctionCount):
-                compoundHash = computeDoubleHash(primary, secondary, i)
+                compoundHash = self.computeDoubleHash(primary, secondary, i)
 
-                if (not self.bits[compondHash]):
+                if (not self.bits[compoundHash]):
                     ++self.trueBits
 
-                self.bits[compoundHash] = true
+                self.bits[compoundHash] = True
 
         # <summary>
         # Convenience method to add many items at once.
@@ -133,10 +134,12 @@ class BloomFilter(object):
             secondary = self.secondaryHashFunction(item)
 
             for i in range(self.hashFunctionCount):
-                compoundHash = computeDoubleHash(primary, secondary, i)
+                compoundHash = self.computeDoubleHash(primary, secondary, i)
 
                 if (not self.bits[compoundHash]):
-                    return false;
+                    return False
+            
+            return True;
 
         # <summary>
         # The 'truthiness' of the filter.
