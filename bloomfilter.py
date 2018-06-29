@@ -64,19 +64,21 @@ class BloomFilter(object):
 
         @classmethod
         def getOptimalError(cls, capacity):
-            if capacity == 1:
-                return Decimal(0.5)
             # Starobinski, David; Trachtenberg, Ari; Agarwal, Sachin (2003), "Efficient PDA Synchronization", IEEE Transactions on Mobile Computing 2 (1): 40, doi:10.1109/TMC.2003.1195150
             return Decimal(1.0) / Decimal(capacity)
 
         @classmethod
         def getOptimalArraySize(cls, capacity, error):
             # Starobinski, David; Trachtenberg, Ari; Agarwal, Sachin (2003), "Efficient PDA Synchronization", IEEE Transactions on Mobile Computing 2 (1): 40, doi:10.1109/TMC.2003.1195150
+            if capacity == 1:
+                return 1
             return int( math.ceil(capacity * math.log(error, (1.0 / math.pow(2, math.log(2.0))))) )
 
         @classmethod
         def getOptimalHashFunctions(cls, capacity, error):
             # Starobinski, David; Trachtenberg, Ari; Agarwal, Sachin (2003), "Efficient PDA Synchronization", IEEE Transactions on Mobile Computing 2 (1): 40, doi:10.1109/TMC.2003.1195150
+            if capacity == 1:
+                return 1
             return int( round(math.log(2.0) * cls.getOptimalArraySize(capacity, error) / capacity) )
 
         def computeDoubleHash(self, primary, secondary, offset):
