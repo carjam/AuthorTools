@@ -95,10 +95,13 @@ class Plagarism:
             prunedPat = prunedPatterns[j]
             firstHit = min(v for v in wild[prunedPat] if v > firstHit)
 
-            #scan outward from minLen to end, continue on inequality, if none, add to contiguous
+            #check back vs actual test for a full match
             patLen=len(pat)
             lenDiff=patLen-len(prunedPat)
             for k in range(patLen):
+            #we know that prunedPat matches text so don't search the whole thing:
+            #'this is a test' with prunedPat = 'est' => from: firstHit - (len(pat)-len(prunedPat)) to: firstHit
+            #'this is a test' with prunedPat = 'tes' => from: firstHit + len(prunedPat) to: firstHit + len(pat)
                 if pat[k] != txt[firstHit+k-lenDiff]:
                     break
 
