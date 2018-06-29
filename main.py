@@ -69,7 +69,9 @@ def main():
   plg = plagarism.rabinKarp(setPat,txt)
   sys.stdout.write('Rabin-Karp found pattern at %s \n' % str(plg))
 
-  wild = plagarism.wildCardSearch('empowers c*to take*of their financial', txt)
+  wildSearch = 'the*est'
+  #wildSearch = 'empowers c*to take*of their financial'
+  wild = plagarism.wildCardSearch(wildSearch, txt)
   sys.stdout.write('Wildcard search found %s \n' % str(wild))
 
 #profile()

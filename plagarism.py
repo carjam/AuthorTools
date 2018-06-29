@@ -82,10 +82,11 @@ class Plagarism:
     wild = self.rabinKarp(set(prunedPatterns), txt)
 
     #loop over patterns in order to find contiguous matches
-    lastFirstHit = max(v for v in wild[prunedPatterns[0]]) 
+    lastLastHit = max(v for v in wild[prunedPatterns[i-1]])
+    lastFirstHit = max(v for v in wild[prunedPatterns[0]] if v < lastLastHit)
+    firstHit=0
     while True:
         j=0
-        firstHit=0
         for pat in patterns:
             if not pat:
                 continue
