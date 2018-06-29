@@ -70,8 +70,8 @@ def main():
   sys.stdout.write('Rabin-Karp found pattern at %s \n' % str(plg))
 
   #wildSearch = 'tsfd;lkasdi*ghasd'
-  #wildSearch = 'the*est'
-  wildSearch = 'empowers c*to take*of their financial'
+  wildSearch = 'the*est'
+  #wildSearch = 'empowers c*to take*of their financial'
   wild = plagarism.wildCardSearch(wildSearch, txt)
   sys.stdout.write('Wildcard search found %s \n' % str(wild))
 
