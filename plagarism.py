@@ -62,7 +62,7 @@ class Plagarism:
   #wildcard pattern search based on rabin-karp
   def wildCardSearch(self, pattern, txt):
     wildcard = '*'
-    patterns = pattern.split(wildcard)
+    patterns = pattern.split(wildcard) #double check - this appears not to work for more than one wildcard
 
     if len(patterns) < 2:
         raise ValueError('Wildcard search requires a wildcard')
@@ -93,19 +93,27 @@ class Plagarism:
             if not pat:
                 continue
             prunedPat = prunedPatterns[j]
-            firstHit = min(v for v in wild[prunedPat] if v > firstHit) #change this to a queue with pop to avoid per iteration search
+            firstHit = min(v for v in wild[prunedPat] if v > firstHit) #change this to a queues with pop to avoid redundant search
 
-            #check back vs actual test for a full match
+            #check truncated search results vs actual text for a full match
             patLen=len(pat)
             lenDiff=patLen-minLen
-            for k in range(patLen):
-            #we know that prunedPat matches text so don't search the whole thing:
-            #'this is a test' with prunedPat = 'est' => from: firstHit - (patLen-minLen) to: firstHit
-            #'this is a test' with prunedPat = 'tes' => from: firstHit + minLen to: firstHit + patLen
-                if pat[k] != txt[firstHit+k-lenDiff]:
-                    break
+            #we know that prunedPat matches text so only verify that which is yet unsearched by rabinKarp
+            print('start:',pat, prunedPat)
+            if j%2==0:
+                l=0
+                for k in range(firstHit - (patLen - minLen), firstHit):
+                    if pat[l] != txt[k]:
+                        break
+                    l+=1
+            else:
+                l=0
+                for k in range(firstHit + minLen, firstHit + patLen):
+                    if pat[l] != txt[k]:
+                        break
+                    l+=1
 
-            if k == patLen-1:
+            if l+minLen == patLen:
                 contiguous[prunedPat].append(firstHit)
 
             j+=1
