@@ -94,8 +94,16 @@ class Plagarism:
                 continue
             prunedPat = prunedPatterns[j]
             firstHit = min(v for v in wild[prunedPat] if v > firstHit)
+
             #scan outward from minLen to end, continue on inequality, if none, add to contiguous
-            contiguous[prunedPat].append(firstHit)
+            patLen=len(pat)
+            lenDiff=patLen-len(prunedPat)
+            for k in range(patLen):
+                if pat[k] != txt[firstHit+k-lenDiff]:
+                    break
+
+            if k == patLen-1:
+                contiguous[prunedPat].append(firstHit)
 
             j+=1
         if j >= i-1 and firstHit >= lastFirstHit:
