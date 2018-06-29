@@ -60,7 +60,6 @@ class Plagarism:
 
 
   #wildcard pattern search based on rabin-karp
-  #refactor to match from wildcard back outward to make sure pruned pattern fully matches requested pattern
   def wildCardSearch(self, pattern, txt):
     wildcard = '*'
     patterns = pattern.split(wildcard)
@@ -70,29 +69,32 @@ class Plagarism:
 
     # rabinKarp only allows for fixed len search so pull minimum length eminating from wildcard outward
     i = 0
-    prunedPatterns = set()
+    prunedPatterns =[] 
     contiguous = dict()
     minLen = min([len(pat) for pat in patterns])
     for pat in patterns:
         if not pat:
             continue
         prunedPat = pat[-minLen:] if i%2==0 else pat[:minLen]
-        prunedPatterns.add(prunedPat)
+        prunedPatterns.append(prunedPat)
         contiguous[prunedPat] = [] #setup key:[empty] for our matches
         i+=1
-    wild = self.rabinKarp(prunedPatterns, txt)
+    wild = self.rabinKarp(set(prunedPatterns), txt)
 
     #loop over patterns in order to find contiguous matches
-    i=0
-    firstHit=0
-    for pat in patterns:
-        if not pat:
-            continue
-        #optimization needed
-        prunedPat = pat[-minLen:] if i%2==0 else pat[:minLen]
-        firstHit = min(v for v in wild[prunedPat] if v > firstHit)
-        #scan outward from minLen to end, continue on inequality, if none, add to contiguous
-        contiguous[prunedPat].append(firstHit)
-        i+=1
+    lastFirstHit = max(v for v in wild[prunedPatterns[0]]) 
+    while True:
+        j=0
+        firstHit=0
+        for pat in patterns:
+            if not pat:
+                continue
+            prunedPat = prunedPatterns[j]
+            firstHit = min(v for v in wild[prunedPat] if v > firstHit)
+            #scan outward from minLen to end, continue on inequality, if none, add to contiguous
+            contiguous[prunedPat].append(firstHit)
+            j+=1
+        if j >= i-1 and firstHit >= lastFirstHit:
+            break
 
     return contiguous
