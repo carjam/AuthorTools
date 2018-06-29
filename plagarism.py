@@ -60,6 +60,7 @@ class Plagarism:
 
 
   #wildcard pattern search based on rabin-karp
+  #further optimization possible
   def wildCardSearch(self, pattern, txt):
     wildcard = '*'
     patterns = pattern.split(wildcard) #double check - this appears not to work for more than one wildcard
@@ -69,11 +70,13 @@ class Plagarism:
 
     # rabinKarp only allows for fixed len search so pull minimum length eminating from wildcard outward
     i = 0
-    prunedPatterns =[] 
+    prunedPatterns = []
+    contiguous = dict()
     minLen = min([len(pat) for pat in patterns])
     for pat in patterns:
         if not pat:
             continue
+        contiguous[pat] = [] #setup key:[empty] for our matches
         prunedPat = pat[-minLen:] if i%2==0 else pat[:minLen]
         prunedPatterns.append(prunedPat)
         i+=1
@@ -82,7 +85,6 @@ class Plagarism:
         return
 
     #loop over patterns in order to find contiguous matches
-    contiguous = dict()
     lastLastHit = max(v for v in wild[prunedPatterns[i-1]])
     lastFirstHit = max(v for v in wild[prunedPatterns[0]] if v < lastLastHit)
     firstHit=0
@@ -92,7 +94,6 @@ class Plagarism:
             if not pat:
                 continue
 
-            contiguous[pat] = [] #setup key:[empty] for our matches
             prunedPat = prunedPatterns[j]
             firstHit = min(v for v in wild[prunedPat] if v > firstHit) #change this to a queue with pop to avoid redundant search
 
@@ -102,21 +103,22 @@ class Plagarism:
             #we know that prunedPat matches text so only verify that which is yet unsearched by rabinKarp
             if j%2==0:
                 l=0
-                for k in range(firstHit - (patLen - minLen), firstHit):
+                start = firstHit - (patLen - minLen)
+                for k in range(start, firstHit):
                     if pat[l] != txt[k]:
                         break
                     l+=1
                 if l+minLen == patLen:
-                    contiguous[pat].append(firstHit - (patLen - minLen))
+                    contiguous[pat].append(start)
             else:
-                l=0
-                for k in range(firstHit + minLen, firstHit + patLen):
+                l=minLen
+                start = firstHit + minLen
+                for k in range(start, firstHit + patLen):
                     if pat[l] != txt[k]:
                         break
                     l+=1
-                if l+minLen == patLen:
-                    contiguous[pat].append(firstHit + minLen)
-
+                if l == patLen:
+                    contiguous[pat].append(start)
 
             j+=1
         if j >= i-1 and firstHit >= lastFirstHit:
