@@ -80,6 +80,8 @@ class Plagarism:
         contiguous[prunedPat] = [] #setup key:[empty] for our matches
         i+=1
     wild = self.rabinKarp(set(prunedPatterns), txt)
+    if not wild[prunedPatterns[i-1]] or not wild[prunedPatterns[0]]:
+        return
 
     #loop over patterns in order to find contiguous matches
     lastLastHit = max(v for v in wild[prunedPatterns[i-1]])
@@ -94,6 +96,7 @@ class Plagarism:
             firstHit = min(v for v in wild[prunedPat] if v > firstHit)
             #scan outward from minLen to end, continue on inequality, if none, add to contiguous
             contiguous[prunedPat].append(firstHit)
+
             j+=1
         if j >= i-1 and firstHit >= lastFirstHit:
             break
