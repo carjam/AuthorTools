@@ -60,7 +60,6 @@ class Plagarism:
 
 
   #wildcard pattern search based on rabin-karp
-  #further optimization possible
   def wildCardSearch(self, pattern, txt):
     wildcard = '*'
     patterns = pattern.split(wildcard) #double check - this appears not to work for more than one wildcard
@@ -71,12 +70,10 @@ class Plagarism:
     # rabinKarp only allows for fixed len search so pull minimum length eminating from wildcard outward
     i = 0
     prunedPatterns = []
-    contiguous = dict()
     minLen = min([len(pat) for pat in patterns])
     for pat in patterns:
         if not pat:
             continue
-        contiguous[pat] = [] #setup key:[empty] for our matches
         prunedPat = pat[-minLen:] if i%2==0 else pat[:minLen]
         prunedPatterns.append(prunedPat)
         i+=1
@@ -84,12 +81,15 @@ class Plagarism:
     if not wild[prunedPatterns[i-1]] or not wild[prunedPatterns[0]]:
         return
 
-    #loop over patterns in order to find contiguous matches
+    # loop over patterns in order to find contiguous matches
+    # contiguous interpretted as farthest left of start string to farthest left of next string
+    contiguous = []
     lastLastHit = max(v for v in wild[prunedPatterns[i-1]])
     lastFirstHit = max(v for v in wild[prunedPatterns[0]] if v < lastLastHit)
     firstHit=0
     while True:
         j=0
+        lft = []
         for pat in patterns:
             if not pat:
                 continue
@@ -101,6 +101,7 @@ class Plagarism:
             patLen=len(pat)
             lenDiff=patLen-minLen
             #we know that prunedPat matches text so only verify that which is yet unsearched by rabinKarp
+            start=0
             if j%2==0:
                 l=0
                 start = firstHit - (patLen - minLen)
@@ -109,7 +110,7 @@ class Plagarism:
                         break
                     l+=1
                 if l+minLen == patLen:
-                    contiguous[pat].append(start)
+                    lft.append(start)
             else:
                 l=minLen
                 start = firstHit + minLen
@@ -118,10 +119,15 @@ class Plagarism:
                         break
                     l+=1
                 if l == patLen:
-                    contiguous[pat].append(start)
+                    lft.append(start)
+
+            if j<=0:
+                left = start
 
             j+=1
-        if j >= i-1 and firstHit >= lastFirstHit:
-            break
+        if j >= i-1:
+            contiguous.append(txt[lft[0]:lft[1]])
+            if firstHit >= lastFirstHit:
+                break
 
     return contiguous
