@@ -82,7 +82,6 @@ class Plagarism:
         return
 
     # loop over patterns in order to find contiguous matches
-    # contiguous interpretted as farthest left of start string to farthest left of next string
     contiguous = []
     lastLastHit = max(v for v in wild[prunedPatterns[i-1]])
     lastFirstHit = max(v for v in wild[prunedPatterns[0]] if v < lastLastHit)
@@ -90,6 +89,8 @@ class Plagarism:
     while True:
         j=0
         lft = []
+        zeroPat = ''
+        zeroPrunedPat = ''
         for pat in patterns:
             if not pat:
                 continue
@@ -111,6 +112,10 @@ class Plagarism:
                     l+=1
                 if l+minLen == patLen:
                     lft.append(start)
+                    #cache [0] values for future pull right (see below)
+                    if len(lft) == 1:
+                        zeroPat = pat
+                        zeroPrunedPat = prunedPat
             else:
                 l=minLen
                 start = firstHit + minLen
@@ -120,6 +125,21 @@ class Plagarism:
                     l+=1
                 if l == patLen:
                     lft.append(start)
+
+                    #if it's the second perfect hit, return to [0] and pull it as far right as it will come to guarantee contiguous
+                    if len(lft) == 2:
+                        while True:
+                            patLen = len(zeroPat)
+                            goodOleHit = max(v for v in wild[zeroPrunedPat] if v < firstHit)
+                            l=0
+                            start = goodOleHit - (patLen - minLen)
+                            for k in range(start, goodOleHit):
+                                if pat[l] != txt[k]:
+                                    break
+                                l+=1
+                            if l+minLen == patLen:
+                                lft[0] = start
+                                break
 
             if j<=0:
                 left = start
