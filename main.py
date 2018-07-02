@@ -62,9 +62,20 @@ def main():
 
   print("\n*** Plagarism ***")
   plagarism = Plagarism()
-  txt = content #"THESE GEEKS FOR GEEKS"
-  pat = "empowers consumers to take control" #"GEEK"
-  plg = plagarism.rabinKarp(pat,txt)
+  txt = content 
+  pat = "empowers consumers to take control"
+  setPat = { "empowers consumers", "a million bank acc", "Contact UsPrivacy " }
+
+  plg = plagarism.rabinKarp(setPat,txt)
   sys.stdout.write('Rabin-Karp found pattern at %s \n' % str(plg))
+
+  #wildSearch = 'tsfd;lkasdi*ghasd'
+  wildSearch = 'the*est'
+  #empowers consumers to take control of their financial
+  #wildSearch = 'empowers c*to take*of their financial'
+  #wildSearch = 'consumers*take control of their'
+  wild = plagarism.wildCardSearch(wildSearch, txt)
+  sys.stdout.write('Wildcard search found %s \n' % str(wild))
+
 #profile()
 main()
