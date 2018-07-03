@@ -1,7 +1,8 @@
 #!/usr/local/bin/python3
 from bloomfilter import BloomFilter
+from itertools import groupby
 
-class Plagarism:
+class TextSearch:
   def rabinKarp(self, patterns, txt):
     if (not txt or not patterns):
         raise ValueError('Search requires text and a pattern')
@@ -151,3 +152,27 @@ class Plagarism:
                 break
 
     return contiguous
+
+  def findCliches(self, text):
+    with open("cliches.txt", "r") as ins:
+        cliches = []
+        for line in ins:
+            cliches.append(line)
+
+    grouped = {}
+    for elem in cliches:
+        key = len(elem)
+        grouped.setdefault(key, []).append(elem)
+    grouped = grouped.values()
+
+    #loop over and call rabinKarp
+    result = dict()
+    for group in grouped:
+        found = self.rabinKarp(group, text)
+        while found:
+            k, v = found.popitem()
+            if v != []:
+                result[k] = v
+
+    print("Consider rephrasing: ", result)
+
