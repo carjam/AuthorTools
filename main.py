@@ -4,7 +4,7 @@ from textutility import TextUtility
 from wordprobability import WordProbability
 from readability import Readability
 from lexicaldiversity import LexicalDiversity
-from plagarism import Plagarism
+from search import TextSearch
 
 def profile():
   import cProfile
@@ -61,7 +61,7 @@ def main():
   sys.stdout.write('\nSummary %s\n' % summary)
 
   print("\n*** Plagarism ***")
-  plagarism = Plagarism()
+  plagarism = TextSearch()
   txt = content 
   pat = "empowers consumers to take control"
   setPat = { "empowers consumers", "a million bank acc", "Contact UsPrivacy " }
@@ -76,6 +76,8 @@ def main():
   #wildSearch = 'consumers*take control of their'
   wild = plagarism.wildCardSearch(wildSearch, txt)
   sys.stdout.write('Wildcard search found %s \n' % str(wild))
+
+  plagarism.findCliches(content)
 
 #profile()
 main()
