@@ -26,7 +26,18 @@ class TextUtility:
   def normalizeText(self):
     cleaner = re.compile('[^a-z]+')
     return cleaner.sub(' ',self.__text)
- 
+
+  @memoized
+  def tokenizeAndRemoveCommonWords(self, minchars):
+    #remove short or non-alpha characters
+    words = self.tokenizeText()
+    txt = [w.lower() for w in words]
+
+    regexp = "[A-Za-z]+"
+    exp = re.compile(regexp)
+    result = [v for v in txt if (exp.match(v) and len(v) >= minchars)]
+    return ' '.join(result).split()
+
   @memoized
   def tokenizeText(self):
     tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
@@ -94,7 +105,8 @@ class TextUtility:
 
   def countWordFrequencies(self):
     word_frequency = {}
-    words = self.tokenizeText()
+    #words = self.tokenizeText()
+    words = self.tokenizeAndRemoveCommonWords(5)
     for word in words:
         if word in word_frequency:
             word_frequency[word] += 1
@@ -102,10 +114,10 @@ class TextUtility:
             word_frequency[word] = 1
     return word_frequency
  
- 
   def countWords(self):
     word_count = 0
-    words = self.tokenizeText()
+    #words = self.tokenizeText()
+    words = self.tokenizeAndRemoveCommonWords(5)
     return len(words)
 
 

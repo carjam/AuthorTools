@@ -25,16 +25,8 @@ class WordProbability(object):
     word_frequency = self.__tu.countWordFrequencies()
     word_count = self.__tu.countWords()
 
-    MIN_CHARS = 5
-    regexp = "[A-Za-z]+"
-    exp = re.compile(regexp)
-    for k, v in list(word_frequency.items()):
-      if not(exp.match(k)):
-        del word_frequency[k]
-
     word_probabilities = {}
     for word in word_frequency.keys():
-      if len(word) >= MIN_CHARS:
         word_probabilities[word] = float(word_frequency[word] / word_count) 
 
     return word_probabilities.items()
@@ -104,20 +96,12 @@ class WordProbability(object):
 
   def tfidf(self, numToReturn):
     vectorizer = TfidfVectorizer()
-    tfidf = vectorizer.fit_transform([self.__tu.normalizeText()])
+    tfidf = vectorizer.fit_transform([' '.join(self.__tu.tokenizeAndRemoveCommonWords(5))])
 
     result = dict()
     feature_names = vectorizer.get_feature_names()
     for col in tfidf.nonzero()[1]:
         result[feature_names[col]] = tfidf[0, col]
-
-    #remove short or non-alpha characters
-    MIN_CHARS = 5
-    regexp = "[A-Za-z]+"
-    exp = re.compile(regexp)
-    for k, v in list(result.items()):
-      if not(exp.match(k)) or len(k) <= MIN_CHARS:
-        del result[k]
 
     #return tfidf
     return sorted(result, key=result.get, reverse=True)[:numToReturn]

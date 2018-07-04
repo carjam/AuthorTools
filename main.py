@@ -17,6 +17,9 @@ def main():
   tu = TextUtility(content)
   cleanText = tu.normalizeText()
 
+  #removedInfrequent = tu.tokenizeAndRemoveCommonWords(4)
+  #print("Without frequent words: ", removedInfrequent)
+
   #Readability measures
   print("\n*** Readability ***")
   readability = Readability(content)
