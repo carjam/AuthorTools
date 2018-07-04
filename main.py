@@ -66,7 +66,7 @@ def main():
   summary = word_probability.summary(55)
   sys.stdout.write('\nSummary %s\n' % summary)
 
-  print("\n*** Plagarism ***")
+  print("\n*** Search/Plagarism ***")
   plagarism = TextSearch()
   txt = content 
   pat = "empowers consumers to take control"
@@ -83,6 +83,8 @@ def main():
   wild = plagarism.wildCardSearch(wildSearch, txt)
   sys.stdout.write('Wildcard search found %s \n' % str(wild))
 
+
+  print("\n*** Cliche Detection ***")
   plagarism.findCliches(content)
 
 #profile()
