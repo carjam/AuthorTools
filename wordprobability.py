@@ -3,13 +3,14 @@ from textutility import TextUtility
 import re
 import numpy
 from memoized import memoized
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 class WordProbability(object):
   def __init__(self,text):
     self.__tu = TextUtility(text)
 
-  
+
   def __is_number(self,s):
     try:
         float(s)
@@ -45,7 +46,7 @@ class WordProbability(object):
 
     probabilities = list(word_probabilities.values())
     percentile_score = numpy.percentile(probabilities,percentile,axis=0, interpolation='lower')
-    
+
     highinfo_words = []
     word_probabilities = dict(sorted(word_probabilities.items(), key=lambda k: k[1], reverse=True))
     for word in word_probabilities:
@@ -63,7 +64,7 @@ class WordProbability(object):
 
     probabilities = list(word_probabilities.values())
     percentile_score = numpy.percentile(probabilities,percentile,axis=0, interpolation='lower')
-    
+
     lowinfo_words = []
     word_probabilities = dict(sorted(word_probabilities.items(), key=lambda k: k[1], reverse=True))
     for word in word_probabilities:
@@ -96,7 +97,29 @@ class WordProbability(object):
           word_match += 1
           if word_match > 1 and len(sentence) < 150 and sentence not in result:
             result.append(sentence)
-    
+
     if len(result) == 0:
       result.append('None available')
     return result
+
+  def tfidf(self, numToReturn):
+    vectorizer = TfidfVectorizer()
+    tfidf = vectorizer.fit_transform([self.__tu.normalizeText()])
+
+    result = dict()
+    feature_names = vectorizer.get_feature_names()
+    for col in tfidf.nonzero()[1]:
+        result[feature_names[col]] = tfidf[0, col]
+
+    #remove short or non-alpha characters
+    MIN_CHARS = 5
+    regexp = "[A-Za-z]+"
+    exp = re.compile(regexp)
+    for k, v in list(result.items()):
+      if not(exp.match(k)) or len(k) <= MIN_CHARS:
+        del result[k]
+
+    #return tfidf
+    return sorted(result, key=result.get, reverse=True)[:numToReturn]
+
+
