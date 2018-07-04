@@ -14,7 +14,7 @@ from itertools import chain
 class TextUtility:
 
   def __init__(self,text):
-    self.__text = text.lower().strip()    
+    self.__text = text.lower().strip()
 
 
   @classmethod
@@ -35,7 +35,12 @@ class TextUtility:
 
     regexp = "[A-Za-z]+"
     exp = re.compile(regexp)
-    result = [v for v in txt if (exp.match(v) and len(v) >= minchars)]
+
+    #WORDS = self.countWordFrequencies(re.findall(r'\w+', open('big.txt').read().lower()))
+    #WORDS.most_common(10)
+    COMMON = ['the', 'of', 'and','to','in','a','that','he','was','it','his','is','with','as','i','had','for','at','by','on','their','there','here','are','you','this','which','not','can']
+
+    result = [v for v in txt if (exp.match(v) and not (v in COMMON) and len(v) >= minchars)]
     return ' '.join(result).split()
 
   @memoized
@@ -106,18 +111,18 @@ class TextUtility:
   def countWordFrequencies(self):
     word_frequency = {}
     #words = self.tokenizeText()
-    words = self.tokenizeAndRemoveCommonWords(5)
+    words = self.tokenizeAndRemoveCommonWords(3)
     for word in words:
         if word in word_frequency:
             word_frequency[word] += 1
         else:
             word_frequency[word] = 1
     return word_frequency
- 
+
   def countWords(self):
     word_count = 0
     #words = self.tokenizeText()
-    words = self.tokenizeAndRemoveCommonWords(5)
+    words = self.tokenizeAndRemoveCommonWords(3)
     return len(words)
 
 

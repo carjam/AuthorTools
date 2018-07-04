@@ -96,14 +96,13 @@ class WordProbability(object):
 
   def tfidf(self, numToReturn):
     vectorizer = TfidfVectorizer()
-    tfidf = vectorizer.fit_transform([' '.join(self.__tu.tokenizeAndRemoveCommonWords(5))])
+    tfidf = vectorizer.fit_transform([' '.join(self.__tu.tokenizeAndRemoveCommonWords(3))])
 
     result = dict()
     feature_names = vectorizer.get_feature_names()
     for col in tfidf.nonzero()[1]:
         result[feature_names[col]] = tfidf[0, col]
 
-    #return tfidf
     return sorted(result, key=result.get, reverse=True)[:numToReturn]
 
 
