@@ -56,7 +56,10 @@ def main():
   word_probability = WordProbability(content)
   hashtags = word_probability.hashtagSuggestions(99)
   sys.stdout.write('Hashtag suggestions %s\n' % hashtags)
-  
+
+  tfidf = word_probability.tfidf(5)
+  print("tfidf: ", tfidf)
+
   summary = word_probability.summary(55)
   sys.stdout.write('\nSummary %s\n' % summary)
 
