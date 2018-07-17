@@ -105,4 +105,3 @@ class WordProbability(object):
 
     return sorted(result, key=result.get, reverse=True)[:numToReturn]
 
-

@@ -11,7 +11,6 @@ class LexicalDiversity(object):
     self.__text = text
     self.__tu = TextUtility(self.__text)
 
-
   # Function to compute the base-2 logarithm of a floating point number.
   def __log2(self,number):
     return log(number) / log(2)
@@ -29,9 +28,11 @@ class LexicalDiversity(object):
   def calcWordEntropy(self):
     word_frequency = self.__tu.countWordFrequencies()
     length_sum = 0.0
+    self.__wordEntropies = dict()
     for word in word_frequency.keys():
       probability = float(word_frequency[word]) / sum(word_frequency.values())
       length_sum -= probability * self.__log2(probability)
+      self.__wordEntropies[word] = -1 * (probability * self.__log2(probability))
     return length_sum
 
 
@@ -69,4 +70,14 @@ class LexicalDiversity(object):
           synonyms[word] = syn_list
 
     return synonyms
+
+  def entropySyllable(self, numToReturn):
+    self.calcWordEntropy()
+
+    result = dict()
+    words = self.__tu.tokenizeAndRemoveCommonWords(3)
+    for word in words:
+        result[word] = TextUtility.countSyllablesInWord(word)  / self.__wordEntropies[word]
+
+    return [(k, result[k]) for k in sorted(result, key=result.get, reverse=True)][:numToReturn]
 

@@ -49,7 +49,7 @@ def main():
   word_entropy = diversity.calcWordEntropy()
   sys.stdout.write('Word entropy: %f \n' % (word_entropy))
 
-  synonym_suggestions = diversity.recommendSynonyms(95,3)
+  synonym_suggestions = diversity.recommendSynonyms(90,3)
   sys.stdout.write('\nHere are some synonyms for frequently occuring words:\n')
   for word in synonym_suggestions.keys():
     print(word,synonym_suggestions[word])
@@ -62,6 +62,10 @@ def main():
 
   tfidf = word_probability.tfidf(5)
   print("tfidf: ", tfidf)
+
+  entrSyl = diversity.entropySyllable(5)
+  entrSylWords = [entry[0] for entry in entrSyl]
+  print("sylEntropy: ", entrSylWords)
 
   summary = word_probability.summary(55)
   sys.stdout.write('\nSummary %s\n' % summary)
